@@ -37,7 +37,9 @@ private:
   double in_;
   double out_;
   double step_;    
-   
+
+  double ptMin_;
+  
   IgDataStorage* storage_;
 
   void addChambers(reco::MuonCollection::const_iterator it);
@@ -63,8 +65,6 @@ private:
   edm::ESGetToken<GEMGeometry, MuonGeometryRecord> gemGeometryToken_;
   const GEMGeometry* gemGeometry_;
   bool gemGeomValid_;
-
-
 };
 
 #endif

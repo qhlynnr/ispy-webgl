@@ -30,6 +30,7 @@ ISpyMuon::ISpyMuon(const edm::ParameterSet& iConfig)
     in_(iConfig.getUntrackedParameter<double>("propagatorIn", 0.0)),
     out_(iConfig.getUntrackedParameter<double>("propagatorOut", 0.0)),
     step_(iConfig.getUntrackedParameter<double>("propagatorStep", 0.05)),
+    ptMin_(iConfig.getParameter<double>("ptMin")),
     dtGeomValid_(false), cscGeomValid_(false), gemGeomValid_(false) 
 {
   muonToken_ = consumes<reco::MuonCollection>(inputTag_);
@@ -243,6 +244,9 @@ void ISpyMuon::analyze(const edm::Event& event, const edm::EventSetup& eventSetu
    
     if ( (*it).combinedMuon().isNonnull() ) // Global
     {
+      if ( (*it).combinedMuon()->pt() < ptMin_ )
+        continue;
+
       IgCollectionItem imuon = globalMuonCollection.create();
 
       if ((*it).isMatchesValid () && (gemGeomValid_ || dtGeomValid_ || cscGeomValid_)) 

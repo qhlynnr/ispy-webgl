@@ -36,7 +36,8 @@ using namespace edm::service;
 using namespace edm;
 
 ISpyPATMuon::ISpyPATMuon(const edm::ParameterSet& iConfig)
-  : inputTag_(iConfig.getParameter<edm::InputTag>("iSpyPATMuonTag"))
+  : inputTag_(iConfig.getParameter<edm::InputTag>("iSpyPATMuonTag")),
+    ptMin_(iConfig.getParameter<double>("ptMin"))
 {
   muonToken_ = consumes<std::vector<pat::Muon> >(inputTag_);
   
@@ -223,7 +224,10 @@ void ISpyPATMuon::analyze(const edm::Event& event, const edm::EventSetup& eventS
     }  // Tracker 
       
     if (t->isGlobalMuon() && t->globalTrack().isAvailable() && t->isMatchesValid() ) // Global
-    { 
+    {
+      if ( t->pt() < ptMin_ )
+        continue;
+
       GlobalPoint outerPoint;
 
       if ( dtGeomValid_ || cscGeomValid_ || gemGeomValid_ ) 
