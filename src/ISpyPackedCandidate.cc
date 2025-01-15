@@ -24,6 +24,10 @@
 
 #include "TrackPropagation/SteppingHelixPropagator/interface/SteppingHelixPropagator.h"
 
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
 using namespace edm::service;
 using namespace edm;
 
@@ -34,6 +38,22 @@ ISpyPackedCandidate::ISpyPackedCandidate(const ParameterSet& iConfig)
 {
   candidateToken_ = consumes<pat::PackedCandidateCollection>(inputTag_);
   magneticFieldToken_ = esConsumes<MagneticField, IdealMagneticFieldRecord>();
+  caloGeometryToken_ = esConsumes<CaloGeometry, CaloGeometryRecord>();        
+}
+
+int ISpyPackedCandidate::findArea(std::vector<CaloCellGeometry::RepCorners>& repcorners, double eta, double phi)
+{
+  for ( size_t i = 0; i < repcorners.size(); ++i ) 
+  {
+    // There are 8 corners. We'll take the "bottom-right" and "top-left"
+    // for range checking.
+
+    if ( eta >= repcorners[i][2].eta() && eta <= repcorners[i][0].eta() &&
+         phi >= repcorners[i][2].phi() && phi <= repcorners[i][0].phi() )
+      return i;
+  }
+
+  return -1;
 }
 
 void ISpyPackedCandidate::analyze(const Event& event, const EventSetup& eventSetup)
@@ -53,13 +73,44 @@ void ISpyPackedCandidate::analyze(const Event& event, const EventSetup& eventSet
 
   Handle<pat::PackedCandidateCollection> collection;
   event.getByToken(candidateToken_, collection);
+  
+  caloGeom_ = &eventSetup.getData(caloGeometryToken_);
+     
+  if ( ! caloGeom_ )
+  {
+    std::string error = 
+      "### Error: ISpyPackedCandidate::analyze: Invalid CaloGeometry ";
+    
+    config->error (error);
+    return;
+  }
 
+  const CaloSubdetectorGeometry *geom = caloGeom_->getSubdetectorGeometry(DetId::Calo, 1);
+  const std::vector<DetId>& ids(geom->getValidDetIds(DetId::Calo, 1));
+
+  std::vector<CaloCellGeometry::CornersVec> calo_corners;
+  std::vector<CaloCellGeometry::RepCorners> calo_rep_corners; 
+
+  // We will use the corners later: using eta and phi to determine which set of eta-phi corners
+  // we want and then use the index to get the set of 8 corners in xyz
+  
+  for ( std::vector<DetId>::const_iterator it = ids.begin(), iEnd = ids.end(); it != iEnd; ++it ) 
+  {
+    auto cell = geom->getGeometry(*it);
+    
+    const CaloCellGeometry::CornersVec& corners = cell->getCorners();
+    const CaloCellGeometry::RepCorners& rep_corners = cell->getCornersREP();
+
+    calo_corners.push_back(corners);
+    calo_rep_corners.push_back(rep_corners);
+  }
+  
   magneticField_ = &eventSetup.getData(magneticFieldToken_);
 
   if ( ! magneticField_ )
   {
     std::string error = 
-      "### Error: ISpyMuon::analyze: Invalid Magnetic field ";
+      "### Error: ISpyPackedCandidate::analyze: Invalid Magnetic field ";
     
     config->error (error);
     return;
@@ -80,6 +131,25 @@ void ISpyPackedCandidate::analyze(const Event& event, const EventSetup& eventSet
     IgCollectionItem item = products.create();
     item[PROD] = product;
 
+    IgCollection &caloTowers = storage->getCollection("CaloTowers_V3");
+    IgProperty CET   = caloTowers.addProperty("et", 0.0);
+    IgProperty CETA  = caloTowers.addProperty("eta", 0.0);
+    IgProperty CPHI  = caloTowers.addProperty("phi", 0.0);
+
+    IgProperty HE   = caloTowers.addProperty("hadEnergy", 0.0);
+    IgProperty EE   = caloTowers.addProperty("emEnergy", 0.0);
+
+    //IgProperty PID = caloTowers.addProperty("pid", int(0));
+    
+    IgProperty FRONT_1 = caloTowers.addProperty("front_1", IgV3d());
+    IgProperty FRONT_2 = caloTowers.addProperty("front_2", IgV3d());
+    IgProperty FRONT_3 = caloTowers.addProperty("front_3", IgV3d());
+    IgProperty FRONT_4 = caloTowers.addProperty("front_4", IgV3d());
+    IgProperty BACK_1 = caloTowers.addProperty("back_1", IgV3d());
+    IgProperty BACK_2 = caloTowers.addProperty("back_2", IgV3d());
+    IgProperty BACK_3 = caloTowers.addProperty("back_3", IgV3d());
+    IgProperty BACK_4 = caloTowers.addProperty("back_4", IgV3d());
+    
     IgCollection &tracks = storage->getCollection("Tracks_V4");
     IgProperty VTX = tracks.addProperty("pos", IgV3d());
     IgProperty P   = tracks.addProperty("dir", IgV3d());
@@ -100,6 +170,34 @@ void ISpyPackedCandidate::analyze(const Event& event, const EventSetup& eventSet
     for ( pat::PackedCandidateCollection::const_iterator c = collection->begin(); 
           c != collection->end(); ++c )
     {
+      int ci = findArea(calo_rep_corners, (*c).eta(), (*c).phi());
+
+      if ( ci < 0 )
+        continue;
+
+      auto corners = calo_corners[ci];
+
+      IgCollectionItem itower = caloTowers.create();
+      itower[CET] = static_cast<double>((*c).et());
+      itower[CETA] = static_cast<double>((*c).eta());
+      itower[CPHI] = static_cast<double>((*c).phi());
+
+      //itower[PID] = static_cast<int>((*c).pdgId());
+
+      double hcalEnergy = (*c).hcalFraction()*(*c).energy()*(*c).caloFraction();
+      double ecalEnergy = (*c).caloFraction()*(*c).energy()*(1-(*c).hcalFraction());
+
+      itower[HE] = hcalEnergy;
+      itower[EE] = ecalEnergy;
+      
+      itower[FRONT_1] = IgV3d(static_cast<double>(corners[0].x()/100.0), static_cast<double>(corners[0].y()/100.0), static_cast<double>(corners[0].z()/100.0));
+      itower[FRONT_2] = IgV3d(static_cast<double>(corners[1].x()/100.0), static_cast<double>(corners[1].y()/100.0), static_cast<double>(corners[1].z()/100.0));
+      itower[FRONT_3] = IgV3d(static_cast<double>(corners[2].x()/100.0), static_cast<double>(corners[2].y()/100.0), static_cast<double>(corners[2].z()/100.0));
+      itower[FRONT_4] = IgV3d(static_cast<double>(corners[3].x()/100.0), static_cast<double>(corners[3].y()/100.0), static_cast<double>(corners[3].z()/100.0));
+      itower[BACK_1] = IgV3d(static_cast<double>(corners[4].x()/100.0), static_cast<double>(corners[4].y()/100.0), static_cast<double>(corners[4].z()/100.0));
+      itower[BACK_2] = IgV3d(static_cast<double>(corners[5].x()/100.0), static_cast<double>(corners[5].y()/100.0), static_cast<double>(corners[5].z()/100.0));
+      itower[BACK_3] = IgV3d(static_cast<double>(corners[6].x()/100.0), static_cast<double>(corners[6].y()/100.0), static_cast<double>(corners[6].z()/100.0));
+      itower[BACK_4] = IgV3d(static_cast<double>(corners[7].x()/100.0), static_cast<double>(corners[7].y()/100.0), static_cast<double>(corners[7].z()/100.0));
 
       if ( ! (*c).hasTrackDetails() )
         continue;
