@@ -131,24 +131,37 @@ void ISpyPackedCandidate::analyze(const Event& event, const EventSetup& eventSet
     IgCollectionItem item = products.create();
     item[PROD] = product;
 
-    IgCollection &caloTowers = storage->getCollection("CaloTowers_V3");
-    IgProperty CET   = caloTowers.addProperty("et", 0.0);
-    IgProperty CETA  = caloTowers.addProperty("eta", 0.0);
-    IgProperty CPHI  = caloTowers.addProperty("phi", 0.0);
+    IgCollection &eTowers = storage->getCollection("EcalTowers_V1");
+    IgProperty EET   = eTowers.addProperty("et", 0.0);
+    IgProperty EETA  = eTowers.addProperty("eta", 0.0);
+    IgProperty EPHI  = eTowers.addProperty("phi", 0.0);
+    IgProperty EE   = eTowers.addProperty("ecal_energy", 0.0);
+    IgProperty ETE  = eTowers.addProperty("energy", 0.0);
+    IgProperty EPID = eTowers.addProperty("pid", int(0));
+    IgProperty EFRONT_1 = eTowers.addProperty("front_1", IgV3d());
+    IgProperty EFRONT_2 = eTowers.addProperty("front_2", IgV3d());
+    IgProperty EFRONT_3 = eTowers.addProperty("front_3", IgV3d());
+    IgProperty EFRONT_4 = eTowers.addProperty("front_4", IgV3d());
+    IgProperty EBACK_1 = eTowers.addProperty("back_1", IgV3d());
+    IgProperty EBACK_2 = eTowers.addProperty("back_2", IgV3d());
+    IgProperty EBACK_3 = eTowers.addProperty("back_3", IgV3d());
+    IgProperty EBACK_4 = eTowers.addProperty("back_4", IgV3d());
 
-    IgProperty HE   = caloTowers.addProperty("hadEnergy", 0.0);
-    IgProperty EE   = caloTowers.addProperty("emEnergy", 0.0);
-
-    //IgProperty PID = caloTowers.addProperty("pid", int(0));
-    
-    IgProperty FRONT_1 = caloTowers.addProperty("front_1", IgV3d());
-    IgProperty FRONT_2 = caloTowers.addProperty("front_2", IgV3d());
-    IgProperty FRONT_3 = caloTowers.addProperty("front_3", IgV3d());
-    IgProperty FRONT_4 = caloTowers.addProperty("front_4", IgV3d());
-    IgProperty BACK_1 = caloTowers.addProperty("back_1", IgV3d());
-    IgProperty BACK_2 = caloTowers.addProperty("back_2", IgV3d());
-    IgProperty BACK_3 = caloTowers.addProperty("back_3", IgV3d());
-    IgProperty BACK_4 = caloTowers.addProperty("back_4", IgV3d());
+    IgCollection &hTowers = storage->getCollection("HcalTowers_V1");
+    IgProperty HET   = hTowers.addProperty("et", 0.0);
+    IgProperty HETA  = hTowers.addProperty("eta", 0.0);
+    IgProperty HPHI  = hTowers.addProperty("phi", 0.0);
+    IgProperty HE   = hTowers.addProperty("hcal_energy", 0.0);
+    IgProperty HTE  = hTowers.addProperty("energy", 0.0);
+    IgProperty HPID = hTowers.addProperty("pid", int(0));
+    IgProperty HFRONT_1 = hTowers.addProperty("front_1", IgV3d());
+    IgProperty HFRONT_2 = hTowers.addProperty("front_2", IgV3d());
+    IgProperty HFRONT_3 = hTowers.addProperty("front_3", IgV3d());
+    IgProperty HFRONT_4 = hTowers.addProperty("front_4", IgV3d());
+    IgProperty HBACK_1 = hTowers.addProperty("back_1", IgV3d());
+    IgProperty HBACK_2 = hTowers.addProperty("back_2", IgV3d());
+    IgProperty HBACK_3 = hTowers.addProperty("back_3", IgV3d());
+    IgProperty HBACK_4 = hTowers.addProperty("back_4", IgV3d());
     
     IgCollection &tracks = storage->getCollection("Tracks_V4");
     IgProperty VTX = tracks.addProperty("pos", IgV3d());
@@ -176,29 +189,102 @@ void ISpyPackedCandidate::analyze(const Event& event, const EventSetup& eventSet
         continue;
 
       auto corners = calo_corners[ci];
-
-      IgCollectionItem itower = caloTowers.create();
-      itower[CET] = static_cast<double>((*c).et());
-      itower[CETA] = static_cast<double>((*c).eta());
-      itower[CPHI] = static_cast<double>((*c).phi());
-
-      //itower[PID] = static_cast<int>((*c).pdgId());
-
-      double hcalEnergy = (*c).hcalFraction()*(*c).energy()*(*c).caloFraction();
-      double ecalEnergy = (*c).caloFraction()*(*c).energy()*(1-(*c).hcalFraction());
-
-      itower[HE] = hcalEnergy;
-      itower[EE] = ecalEnergy;
+      auto pid = (*c).pdgId();
       
-      itower[FRONT_1] = IgV3d(static_cast<double>(corners[0].x()/100.0), static_cast<double>(corners[0].y()/100.0), static_cast<double>(corners[0].z()/100.0));
-      itower[FRONT_2] = IgV3d(static_cast<double>(corners[1].x()/100.0), static_cast<double>(corners[1].y()/100.0), static_cast<double>(corners[1].z()/100.0));
-      itower[FRONT_3] = IgV3d(static_cast<double>(corners[2].x()/100.0), static_cast<double>(corners[2].y()/100.0), static_cast<double>(corners[2].z()/100.0));
-      itower[FRONT_4] = IgV3d(static_cast<double>(corners[3].x()/100.0), static_cast<double>(corners[3].y()/100.0), static_cast<double>(corners[3].z()/100.0));
-      itower[BACK_1] = IgV3d(static_cast<double>(corners[4].x()/100.0), static_cast<double>(corners[4].y()/100.0), static_cast<double>(corners[4].z()/100.0));
-      itower[BACK_2] = IgV3d(static_cast<double>(corners[5].x()/100.0), static_cast<double>(corners[5].y()/100.0), static_cast<double>(corners[5].z()/100.0));
-      itower[BACK_3] = IgV3d(static_cast<double>(corners[6].x()/100.0), static_cast<double>(corners[6].y()/100.0), static_cast<double>(corners[6].z()/100.0));
-      itower[BACK_4] = IgV3d(static_cast<double>(corners[7].x()/100.0), static_cast<double>(corners[7].y()/100.0), static_cast<double>(corners[7].z()/100.0));
+      if ( abs(pid) == 11 || pid == 22 ) // i.e. e+/e- or photon
+      {
+         IgCollectionItem etower = eTowers.create();
+        
+        etower[EET] = static_cast<double>((*c).et());
+        etower[EETA] = static_cast<double>((*c).eta());
+        etower[EPHI] = static_cast<double>((*c).phi());
 
+        etower[EPID] = static_cast<int>((*c).pdgId());
+
+        etower[EE] = (*c).caloFraction()*(*c).energy()*(1-(*c).hcalFraction());
+	etower[ETE] = (*c).energy();
+	
+        etower[EFRONT_1] =
+          IgV3d(static_cast<double>(corners[0].x()/100.0),
+		static_cast<double>(corners[0].y()/100.0),
+		static_cast<double>(corners[0].z()/100.0));
+        etower[EFRONT_2] =
+          IgV3d(static_cast<double>(corners[1].x()/100.0),
+		static_cast<double>(corners[1].y()/100.0),
+		static_cast<double>(corners[1].z()/100.0));
+        etower[EFRONT_3] =
+          IgV3d(static_cast<double>(corners[2].x()/100.0),
+		static_cast<double>(corners[2].y()/100.0),
+		static_cast<double>(corners[2].z()/100.0));
+        etower[EFRONT_4] =
+          IgV3d(static_cast<double>(corners[3].x()/100.0),
+		static_cast<double>(corners[3].y()/100.0),
+		static_cast<double>(corners[3].z()/100.0));
+        etower[EBACK_1] =
+          IgV3d(static_cast<double>(corners[4].x()/100.0),
+		static_cast<double>(corners[4].y()/100.0),
+		static_cast<double>(corners[4].z()/100.0));
+        etower[EBACK_2] =
+          IgV3d(static_cast<double>(corners[5].x()/100.0),
+		static_cast<double>(corners[5].y()/100.0),
+		static_cast<double>(corners[5].z()/100.0));
+        etower[EBACK_3] =
+          IgV3d(static_cast<double>(corners[6].x()/100.0),
+		static_cast<double>(corners[6].y()/100.0),
+		static_cast<double>(corners[6].z()/100.0));
+        etower[EBACK_4] =
+          IgV3d(static_cast<double>(corners[7].x()/100.0),
+		static_cast<double>(corners[7].y()/100.0),
+		static_cast<double>(corners[7].z()/100.0));
+      }
+
+      if ( abs(pid) == 211 || pid == 130 ) 
+      {
+        IgCollectionItem htower = hTowers.create();
+        
+        htower[HET] = static_cast<double>((*c).et());
+        htower[HETA] = static_cast<double>((*c).eta());
+        htower[HPHI] = static_cast<double>((*c).phi());
+
+        htower[HPID] = static_cast<int>((*c).pdgId());
+
+        htower[HE] = (*c).hcalFraction()*(*c).energy()*(*c).caloFraction();
+	htower[HTE] = (*c).energy();
+	
+        htower[HFRONT_1] =
+          IgV3d(static_cast<double>(corners[0].x()/100.0),
+		static_cast<double>(corners[0].y()/100.0),
+		static_cast<double>(corners[0].z()/100.0));
+        htower[HFRONT_2] =
+          IgV3d(static_cast<double>(corners[1].x()/100.0),
+		static_cast<double>(corners[1].y()/100.0),
+		static_cast<double>(corners[1].z()/100.0));
+        htower[HFRONT_3] =
+          IgV3d(static_cast<double>(corners[2].x()/100.0),
+		static_cast<double>(corners[2].y()/100.0),
+		static_cast<double>(corners[2].z()/100.0));
+        htower[HFRONT_4] =
+          IgV3d(static_cast<double>(corners[3].x()/100.0),
+		static_cast<double>(corners[3].y()/100.0),
+		static_cast<double>(corners[3].z()/100.0));
+        htower[HBACK_1] =
+          IgV3d(static_cast<double>(corners[4].x()/100.0),
+		static_cast<double>(corners[4].y()/100.0),
+		static_cast<double>(corners[4].z()/100.0));
+        htower[HBACK_2] =
+          IgV3d(static_cast<double>(corners[5].x()/100.0),
+		static_cast<double>(corners[5].y()/100.0),
+		static_cast<double>(corners[5].z()/100.0));
+        htower[HBACK_3] =
+          IgV3d(static_cast<double>(corners[6].x()/100.0),
+		static_cast<double>(corners[6].y()/100.0),
+		static_cast<double>(corners[6].z()/100.0));
+        htower[HBACK_4] =
+          IgV3d(static_cast<double>(corners[7].x()/100.0),
+		static_cast<double>(corners[7].y()/100.0),
+		static_cast<double>(corners[7].z()/100.0)); 
+      }
+      
       if ( ! (*c).hasTrackDetails() )
         continue;
 
