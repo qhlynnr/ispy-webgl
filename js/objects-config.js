@@ -448,17 +448,38 @@ ispy.event_description = {
 	},
 	"PFJets_V2": {
 	    type: ispy.SHAPE, on: true, group: "Physics", name: "Jets (PF)",
-	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6},
-	    selection: {"min_et": 10.0}, cuts: true
+	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 1.0},
+	    selection: {"min_et": 10.0}, width: 1.0, cuts: true
 	},
+	"AK4PFJets_V1": {
+	    type: ispy.SHAPE, on: true, group: "Physics", name: "AK4 Jets (PF)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 1.0},
+            selection: {"min_et": 10.0},  cuts: true
+        },
+	"AK8PFJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK8 Jets (PF)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 2.0},
+            selection: {"min_et": 10.0}, width: 2.0, cuts: true
+        },
 	"GenJets_V1": {
 	    type: ispy.SHAPE, on: true, group: "Physics", name: "Jets (Sim)",
 	    fn: ispy.makeJet, style: {color: "rgb(100%, 75%, 0%)", opacity: 0.8}, selection: {"min_et": 10.0}
 	},
 	"PATJets_V1": {
 	    type: ispy.SHAPE, on: true, group: "Physics", name: "Jets (PAT)",
-	    fn: ispy.makeJet, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3}, selection: {"min_et": 10.0}
+	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
 	},
+	"AK4PATJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK4 Jets (PAT)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
+        },
+	"AK8PATJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK8 Jets (PAT)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 2.0},
+	    selection: {"min_et": 10.0}
+        },
 	"Photons_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Photons (Reco)",
 	    fn: ispy.makePhoton, style: {color: "rgb(100%, 80%, 0%)", opacity: 1.0, linewidth: 2}, selection: {"min_energy": 10.0}
@@ -798,17 +819,38 @@ ispy.event_description = {
 	},
 	"PFJets_V2": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Jets (PF)",
-	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6},
+	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 1.0},
 	    selection: {"min_et": 10.0}, cuts: true
 	},
+	"AK4PFJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK4 Jets (PF)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 1.0},
+            selection: {"min_et": 10.0}, cuts: true
+        },
+        "AK8PFJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK8 Jets (PF)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 2.0},
+            selection: {"min_et": 10.0}, cuts: true
+        },
 	"GenJets_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Jets (Sim)",
 	    fn: ispy.makeJet, style: {color: "rgb(100%, 75%, 0%)", opacity: 0.8}, selection: {"min_et": 10.0}
 	},
 	"PATJets_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Jets (PAT)",
-	    fn: ispy.makeJet, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3}, selection: {"min_et": 10.0}
+	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
 	},
+	"AK4PATJets_V1": {
+            type: ispy.SHAPE, on: false, group: "Physics", name: "AK4 Jets (PAT)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
+        },
+	"AK8PATJets_V1": {
+            type: ispy.SHAPE, on: false, group: "Physics", name: "AK8 Jets (PAT)",
+            fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 2.0},
+	    selection: {"min_et": 10.0}
+        },
 	"Photons_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Photons (Reco)",
 	    fn: ispy.makePhoton, style: {color: "rgb(100%, 80%, 0%)", opacity: 1.0, linewidth: 2}, selection: {"min_energy": 10.0}
@@ -1160,17 +1202,38 @@ ispy.event_description = {
 	},
 	"PFJets_V2": {
 	    type: ispy.SHAPE, on: true, group: "Physics", name: "Jets (PF)",
-	    fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6},
+	    fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 1.0},
 	    selection: {"min_et": 10.0}, cuts: true
-	},
+        },
+	"AK4PFJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK4 Jets (PF)",
+            fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 1.0},
+            selection: {"min_et": 10.0}, cuts: true
+        },
+	"AK8PFJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK8 Jets (PF)",
+            fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6, width: 2.0},
+            selection: {"min_et": 10.0}, cuts: true
+        },
 	"GenJets_V1": {
 	    type: ispy.SHAPE, on: true, group: "Physics", name: "Jets (Sim)",
 	    fn: ispy.makeJetRZ, style: {color: "rgb(100%, 75%, 0%)", opacity: 0.8}, selection: {"min_et": 10.0}
 	},
 	"PATJets_V1": {
 	    type: ispy.SHAPE, on: true, group: "Physics", name: "Jets (PAT)",
-	    fn: ispy.makeJetRZ, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3}, selection: {"min_et": 10.0}
+	    fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
 	},
+	"AK4PATJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK4 Jets (PAT)",
+            fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
+        }, 
+        "AK8PATJets_V1": {
+            type: ispy.SHAPE, on: true, group: "Physics", name: "AK8 Jets (PAT)",
+            fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 2.0},
+	    selection: {"min_et": 10.0}
+        },
 	"Photons_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Photons (Reco)",
 	    fn: ispy.makePhotonRZ, style: {color: "rgb(100%, 80%, 0%)", opacity: 1.0, linewidth: 2}, selection: {"min_energy": 10.0}
