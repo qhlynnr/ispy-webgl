@@ -4,17 +4,13 @@ ispy.isGeometry = false;
 ispy.loaded_local = false;
 
 ispy.openDialog = function(id) {
-
-    //document.getElementById(id).style.display = 'block';
-    $(id).modal('show');
-
+    const el = document.querySelector(id);
+    bootstrap.Modal.getOrCreateInstance(el).show();
 };
 
 ispy.closeDialog = function(id) {
-
-    //document.getElementById(id).style.display = 'none';
-    $(id).modal('hide');
-
+    const el = document.querySelector(id);
+    bootstrap.Modal.getOrCreateInstance(el).hide();
 };
 
 ispy.hasFileAPI = function() {
@@ -104,16 +100,14 @@ ispy.enableNextPrev = function() {
 ispy.loadEvent = function() {
 
     document.getElementById('event-loaded').innerHTML = '';
-    //document.getElementById('loading').style.display = 'block';
-    
-    //$("#event-loaded").html("");
-    $("#loading").modal("show");
+    ispy.openDialog('#loading');
 
     ispy.selected_objects.clear();
 
     // Hide Detector stuff in tree view if already shown
-    if ( $('i.Detector').hasClass('glyphicon-chevron-down') ) {
-	
+    const detectorIcon = document.querySelector('i.Detector');
+    if ( detectorIcon && detectorIcon.classList.contains('glyphicon-chevron-down') ) {
+
 	ispy.toggleCollapse('Detector');
     }
     
@@ -129,12 +123,11 @@ ispy.loadEvent = function() {
     
     }
 
-    //document.getElementById('loading').style.display = 'none';
-    $("#loading").modal("hide");
+    ispy.closeDialog('#loading');
 
     if ( ispy.isGeometry ) {
 
-	$.extend(ispy.detector, event);
+	Object.assign(ispy.detector, event);
 	ispy.addDetector();
 	ispy.isGeometry = false;
 
@@ -188,16 +181,16 @@ ispy.selectLocalFile = function(index) {
 	var zip = new JSZip(data);
 	var event_list = [];
 
-	$.each(zip.files, function(index, zipEntry) {
+	Object.entries(zip.files).forEach(([index, zipEntry]) => {
 
 		if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
-		    
+
 		    if ( zipEntry.name.split('/')[0] === 'Geometry' ) {
-          
+
 			ispy.isGeometry = true;
-		    
+
 		    }
-        
+
 		    event_list.push(zipEntry.name);
 		}
 	    });
@@ -271,8 +264,7 @@ ispy.loadDroppedFile = function(file) {
     var reader = new FileReader();
     ispy.file_name = file.name;
 
-    //document.getElementById('loading').style.display = 'block';
-    $('#loading').modal('show');
+    ispy.openDialog('#loading');
 
     reader.onload = function(e) {
 
@@ -281,16 +273,16 @@ ispy.loadDroppedFile = function(file) {
 
 	var event_list = [];
 
-	$.each(zip.files, function(index, zipEntry) {
+	Object.entries(zip.files).forEach(([index, zipEntry]) => {
 
 	    if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
 
 		if ( zipEntry.name.split('/')[0] === 'Geometry' ) {
-			
+
 		    ispy.isGeometry = true;
-			
+
 		}
-		    
+
 		event_list.push(zipEntry.name);
 
 	    }
@@ -301,11 +293,10 @@ ispy.loadDroppedFile = function(file) {
 	ispy.event_index = 0;
 	ispy.updateEventList();
 	ispy.ig_data = zip;
-	
+
 	ispy.loadEvent();
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 
     };
 
@@ -326,27 +317,27 @@ ispy.selectFile = function(filename) {
     var new_file_name = filename.split('/')[2]; // of course this isn't a general case for files
     ispy.file_name = new_file_name;
 
-    //document.getElementById('progress').style.display = 'block';
-    $('#progress').modal('show');
-    
+    ispy.openDialog('#progress');
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", filename, true);
     xhr.overrideMimeType("text/plain; charset=x-user-defined");
-    
+
     ispy.clearTable("browser-events");
     var ecell = document.getElementById("browser-events").insertRow(0).insertCell(0);
     ecell.innerHTML = 'Loading events...';
 
     xhr.onprogress = function(evt) {
-    
+
 	if ( evt.lengthComputable ) {
-     
+
 	    var percentComplete = Math.round((evt.loaded / evt.total)*100);
-	    $('.progress-bar').attr('style', 'width:'+percentComplete+'%;');
-	    $('.progress-bar').html(percentComplete+'%');
-   
+	    const progressBar = document.querySelector('.progress-bar');
+	    progressBar.style.width = percentComplete + '%';
+	    progressBar.textContent = percentComplete + '%';
+
 	}
-    
+
     };
 
     xhr.onreadystatechange = function () {
@@ -363,29 +354,27 @@ ispy.selectFile = function(filename) {
 
 	    });
 
-	    $('#progress').modal('hide');
-	    //$('.progress-bar').attr('style', 'width:0%;');
-	    //$('.progress-bar').html('0%');
-    
+	    ispy.closeDialog('#progress');
+
 	}
-  
+
     };
 
     xhr.onload = function() {
-    
+
 	if ( this.status === 200 ) {
 
 	    var zip = JSZip(xhr.responseText);
 	    var event_list = [];
-	    
-	    $.each(zip.files, function(index, zipEntry) {
-		    
+
+	    Object.entries(zip.files).forEach(([index, zipEntry]) => {
+
 		if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
-          
+
 		    event_list.push(zipEntry.name);
-        
+
 		}
-      
+
 	    });
 
 	    ispy.event_list = event_list;
@@ -454,8 +443,7 @@ ispy.showWebFiles = function() {
   
     }
 
-    //document.getElementById('open-files').style.display = 'none';
-    $('#open-files').modal('hide');
+    ispy.closeDialog('#open-files');
 
 };
 
@@ -566,8 +554,7 @@ ispy.readOBJ = function(file, cb) {
 
     reader.onload = function(e) {
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 	cb(e.target.result, file.name);
 
     };
@@ -650,8 +637,7 @@ ispy.loadOBJMTL = function(obj, mtl_file, name) {
 
 	    });
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 
 	object.name = name;
 	object.visible = true;
@@ -659,7 +645,7 @@ ispy.loadOBJMTL = function(obj, mtl_file, name) {
 
 	ispy.scene.getObjectByName("Imported").add(object);
 	ispy.addSelectionRow("Imported", name, name, [], true);
-  
+
     };
 
     reader.readAsText(mtl_file);
@@ -694,11 +680,8 @@ ispy.importModel = function() {
 	
 	}
 
-	//document.getElementById('loading').style.display = 'block';
-	//document.getElementById('import-model').style.display = 'none';
-	
-	$('#loading').modal('show');
-	$('#import-model').modal('hide');
+	ispy.openDialog('#loading');
+	ispy.closeDialog('#import-model');
 
 	ispy.readOBJ(files[0], ispy.loadOBJ);
 
@@ -726,11 +709,8 @@ ispy.importModel = function() {
 	
 	}
 	
-	//document.getElementById('loading').style.display = 'block';
-	//document.getElementById('import-model').style.display = 'none';
-	
-	$('#loading').modal('show');
-	$('#import-model').modal('hide');
+	ispy.openDialog('#loading');
+	ispy.closeDialog('#import-model');
 
 	ispy.readOBJMTL(obj_file, mtl_file, ispy.loadOBJMTL);
 	
@@ -1085,8 +1065,7 @@ ispy.importDetector = function() {
 
     ];
 
-    //document.getElementById('loading').style.display = 'block';
-    $('#loading').modal('show');
+    ispy.openDialog('#loading');
 
     function loadGLTFs() {
 
@@ -1133,11 +1112,10 @@ ispy.importDetector = function() {
 
 	});
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 
     }
-    
+
     loadGLTFs();
     
 };

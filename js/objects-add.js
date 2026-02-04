@@ -552,14 +552,15 @@ ispy.addToScene = function(event, view) {
 };
 
 ispy.addEvent = function(event) {
-    
+
     ispy.current_event = event;
     // Clear table from last event and show default caption
-    $('#collection-table').empty();
-    $('#collection-table').append(ispy.table_caption);
+    const collectionTable = document.getElementById('collection-table');
+    collectionTable.innerHTML = '';
+    collectionTable.insertAdjacentHTML('beforeend', ispy.table_caption);
 
     // remove selectors for last event
-    $("tr.Event").remove();
+    document.querySelectorAll('tr.Event').forEach(el => el.remove());
 
     // Clear the subfolders for event information in the treegui
     ispy.clearSubfolders();
