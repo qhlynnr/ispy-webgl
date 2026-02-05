@@ -4,9 +4,11 @@
 
 - [Node.js](https://nodejs.org/) (v18 or later)
 
-## Install
+## Clone and install
 
 ```
+git clone https://github.com/cms-outreach/ispy-webgl.git
+cd ispy-webgl
 npm install
 ```
 
