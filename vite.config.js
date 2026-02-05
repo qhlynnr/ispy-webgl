@@ -1,6 +1,15 @@
 import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-  // Serve static assets from the project root
   publicDir: false,
+  plugins: [
+    viteStaticCopy({
+      targets: [
+        { src: 'geometry', dest: '.' },
+        { src: 'data', dest: '.' },
+        { src: 'fonts/helvetiker_regular.typeface.json', dest: 'fonts' },
+      ]
+    })
+  ]
 });
