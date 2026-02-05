@@ -1,4 +1,4 @@
-var ispy = ispy || {};
+import ispy from './ispy-state.js';
 ispy.detector = {"Collections":{}};
 ispy.version = "v1.0.2-rc";
 

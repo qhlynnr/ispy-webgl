@@ -1,3 +1,8 @@
+import ispy from './ispy-state.js';
+import { GLTFLoader, Line, Mesh, MTLLoader, OBJLoader } from './three-imports.js';
+import JSZip from 'jszip';
+import { Modal } from 'bootstrap';
+
 ispy.ig_data = null;
 ispy.ievent = 0;
 ispy.isGeometry = false;
@@ -5,12 +10,12 @@ ispy.loaded_local = false;
 
 ispy.openDialog = function(id) {
     const el = document.querySelector(id);
-    bootstrap.Modal.getOrCreateInstance(el).show();
+    Modal.getOrCreateInstance(el).show();
 };
 
 ispy.closeDialog = function(id) {
     const el = document.querySelector(id);
-    bootstrap.Modal.getOrCreateInstance(el).hide();
+    Modal.getOrCreateInstance(el).hide();
 };
 
 ispy.hasFileAPI = function() {
@@ -571,7 +576,7 @@ ispy.readOBJ = function(file, cb) {
 
 ispy.loadOBJ = function(contents, name) {
 
-    let object = new THREE.OBJLoader().parse(contents);
+    let object = new OBJLoader().parse(contents);
     object.name = name;
 
     object.children.forEach(function(c) {
@@ -608,18 +613,18 @@ ispy.readOBJMTL = function(file, mtl_file, cb) {
 
 ispy.loadOBJMTL = function(obj, mtl_file, name) {
  
-    let object = new THREE.OBJLoader().parse(obj);
+    let object = new OBJLoader().parse(obj);
     let reader = new FileReader();
 
     reader.onload = function(e) {
 
 	let mtl = e.target.result;
-	let materials_creator = new THREE.MTLLoader().parse(e.target.result);
+	let materials_creator = new MTLLoader().parse(e.target.result);
 	materials_creator.preload();
 
 	object.traverse(function (o) {
 
-		if ( o instanceof THREE.Mesh || o instanceof THREE.Line ) {
+		if ( o instanceof Mesh || o instanceof Line ) {
        
 		    if ( o.material.name ) {
 
@@ -740,7 +745,7 @@ ispy.loadSelectedGLTF = function() {
     let name = ispy.selected_gltf.split('.')[0];
     let gltf_file = './geometry/gltf/'+ispy.selected_gltf;
     
-    const gltf_loader = new THREE.GLTFLoader();
+    const gltf_loader = new GLTFLoader();
 
     gltf_loader.load(
 	gltf_file,
@@ -786,13 +791,13 @@ ispy.loadSelectedObj = function() {
 
 ispy.loadOBJMTL_new = function(obj_file, mtl_file, id, name, group, show) {
     
-    var mtl_loader = new THREE.MTLLoader();
+    var mtl_loader = new MTLLoader();
 
     mtl_loader.load(mtl_file, function(materials) {
 
 	materials.preload();
 
-	var obj_loader = new THREE.OBJLoader();
+	var obj_loader = new OBJLoader();
 	obj_loader.setMaterials(materials);
 
 	obj_loader.load(obj_file, function(object) {
@@ -835,7 +840,7 @@ ispy.importBeampipe = function() {
 
 ispy.importDetector = function() {
 
-    const gltf_loader = new THREE.GLTFLoader();
+    const gltf_loader = new GLTFLoader();
     
     const gltf_objs = [
 	{

@@ -1,3 +1,7 @@
+import ispy from './ispy-state.js';
+import { Mesh, MeshBasicMaterial, SphereGeometry } from './three-imports.js';
+import TWEEN from './lib/tween.min.js';
+
 // This is particular to the sequence below:
 // - Colliding bunch crossings
 // - Zoom into position inside detector
@@ -173,15 +177,15 @@ ispy.toggleAnimation = function() {
 
 	zoom3.delay(1000);
 
-	let pgeometry = new THREE.SphereGeometry(0.25,32,32);
-	let pmaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
+	let pgeometry = new SphereGeometry(0.25,32,32);
+	let pmaterial = new MeshBasicMaterial({color: 0xffff00});
 
-	let proton1 = new THREE.Mesh(pgeometry, pmaterial);
+	let proton1 = new Mesh(pgeometry, pmaterial);
 	proton1.position.x = animation.collision.proton1.pi.x;
 	proton1.position.y = animation.collision.proton1.pi.y;
 	proton1.position.z = animation.collision.proton1.pi.z;
 
-	let proton2 = new THREE.Mesh(pgeometry, pmaterial);
+	let proton2 = new Mesh(pgeometry, pmaterial);
 	proton2.position.x = animation.collision.proton2.pi.x;
 	proton2.position.y = animation.collision.proton2.pi.y;
 	proton2.position.z = animation.collision.proton2.pi.z;

@@ -1,3 +1,6 @@
+import ispy from './ispy-state.js';
+import { GLTFExporter, OBJExporter, Vector3 } from './three-imports.js';
+
 ispy.resetView = function() {
 
     ispy.setPerspective();
@@ -21,7 +24,7 @@ ispy.setXY = function() {
     ispy.camera.position.x = 0;
     ispy.camera.position.y = 0;
     ispy.camera.position.z = length;
-    ispy.camera.up = new THREE.Vector3(0,1,0);
+    ispy.camera.up = new Vector3(0,1,0);
 
     ispy.lookAtOrigin();
 
@@ -34,7 +37,7 @@ ispy.setZX = function() {
     ispy.camera.position.x = 0;
     ispy.camera.position.y = length;
     ispy.camera.position.z = 0;
-    ispy.camera.up = new THREE.Vector3(1,0,0);
+    ispy.camera.up = new Vector3(1,0,0);
 
     ispy.lookAtOrigin();
 
@@ -47,7 +50,7 @@ ispy.setYZ = function() {
     ispy.camera.position.x = -length;
     ispy.camera.position.y = 0;
     ispy.camera.position.z = 0;
-    ispy.camera.up = new THREE.Vector3(0,1,0);
+    ispy.camera.up = new Vector3(0,1,0);
     
     ispy.lookAtOrigin();
 
@@ -296,7 +299,7 @@ ispy.printImage = function() {
 
 ispy.exportScene = function() {
 
-    const exporter = new THREE.GLTFExporter();
+    const exporter = new GLTFExporter();
 
     const options = {
 	onlyVisible: true,
@@ -369,7 +372,7 @@ ispy.exportGLTF = function(binary) {
     document.getElementById('export-model').style.display = 'none';
     //$('#export-model').hide();
     
-    const exporter = new THREE.GLTFExporter();
+    const exporter = new GLTFExporter();
 
     const options = {
 	binary: binary
@@ -413,7 +416,7 @@ ispy.exportOBJ = function() {
     document.getElementById('export-model').style.display = 'none';
     //$('#export-model').hide();
     
-    const exporter = new THREE.OBJExporter();
+    const exporter = new OBJExporter();
 
     ispy.scene.children.forEach(function(c) {
 	    

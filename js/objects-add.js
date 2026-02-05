@@ -1,3 +1,10 @@
+import ispy from './ispy-state.js';
+import {
+    BufferGeometryUtils, Color, DoubleSide, Line, Line2, LineMaterial,
+    LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial, Object3D,
+    Points, PointsMaterial
+} from './three-imports.js';
+
 ispy.addDetector = function() {
 
     for ( let key in ispy.detector_description ) {
@@ -18,14 +25,14 @@ ispy.addDetector = function() {
 	const visible = ! ispy.disabled[key] ? descr.on = true : descr.on = false;
 	ispy.addSelectionRow(descr.group, key, descr.name, [], visible);
 
-	const obj = new THREE.Object3D();
+	const obj = new Object3D();
 	
 	obj.name = key;
 	obj.visible = visible;
 	
 	ispy.scene.getObjectByName(descr.group).add(obj);
 
-	const ocolor = new THREE.Color(descr.style.color);
+	const ocolor = new Color(descr.style.color);
 	//const transp = descr.style.opacity < 1.0 ? true : false;
 	const transp = true; // Make true for all?
 	
@@ -33,7 +40,7 @@ ispy.addDetector = function() {
 
 	case ispy.BOX:
 
-	    let box_material = new THREE.LineBasicMaterial({
+	    let box_material = new LineBasicMaterial({
 		color:ocolor, 
 		transparent: transp,
 		linewidth:descr.style.linewidth, 
@@ -50,8 +57,8 @@ ispy.addDetector = function() {
         
 	    }
 	    
-	    let box = new THREE.LineSegments(
-		THREE.BufferGeometryUtils.mergeBufferGeometries(box_geometries),
+	    let box = new LineSegments(
+		BufferGeometryUtils.mergeBufferGeometries(box_geometries),
 		box_material
 	    );
 	    
@@ -63,7 +70,7 @@ ispy.addDetector = function() {
 
 	case ispy.SOLIDBOX:
 
-	    let solidbox_material = new THREE.MeshBasicMaterial({
+	    let solidbox_material = new MeshBasicMaterial({
 		color:ocolor,
 		transparent: transp,
 		opacity:descr.style.opacity,
@@ -71,7 +78,7 @@ ispy.addDetector = function() {
 		clippingPlanes: ispy.local_planes
 	    });
         
-	    solidbox_material.side = THREE.DoubleSide;
+	    solidbox_material.side = DoubleSide;
 
 	    let boxes = [];
 	    let lines = [];
@@ -88,8 +95,8 @@ ispy.addDetector = function() {
         
 	    }
 
-	    let meshes = new THREE.Mesh(
-		THREE.BufferGeometryUtils.mergeBufferGeometries(boxes),
+	    let meshes = new Mesh(
+		BufferGeometryUtils.mergeBufferGeometries(boxes),
 		solidbox_material
 	    );
 
@@ -97,15 +104,15 @@ ispy.addDetector = function() {
 	    meshes.renderOrder = 1;
 	    ispy.scene.getObjectByName(key).add(meshes);
 
-	    let line_material = new THREE.LineBasicMaterial({
+	    let line_material = new LineBasicMaterial({
 		    color:0x000000,
 		    transparent: false,
 		    linewidth:1,
 		    depthTest: false
 		});
 
-	    let line_mesh = new THREE.LineSegments(
-		THREE.BufferGeometryUtils.mergeBufferGeometries(lines),
+	    let line_mesh = new LineSegments(
+		BufferGeometryUtils.mergeBufferGeometries(lines),
 		line_material
 	    );
 
@@ -164,7 +171,7 @@ ispy.addToScene = function(event, view) {
 	const objectIds = [];
 	const visible = ! ispy.disabled[key] ? descr.on = true : descr.on = false;
 
-	const obj = new THREE.Object3D();
+	const obj = new Object3D();
 	
 	obj.name = key;
 	obj.visible = visible;
@@ -176,7 +183,7 @@ ispy.addToScene = function(event, view) {
 
 	if ( descr.style.color !== undefined ) {
 	    
-	    ocolor = new THREE.Color();
+	    ocolor = new Color();
 	    ocolor.setStyle(descr.style.color);
 
 	}
@@ -195,9 +202,9 @@ ispy.addToScene = function(event, view) {
 
 	    }
 
-	    const line = new THREE.LineSegments(
-		THREE.BufferGeometryUtils.mergeBufferGeometries(boxes),
-		new THREE.LineBasicMaterial({
+	    const line = new LineSegments(
+		BufferGeometryUtils.mergeBufferGeometries(boxes),
+		new LineBasicMaterial({
 		    color:ocolor, 
 		    transparent: transp,
 		    linewidth:descr.style.linewidth,
@@ -230,7 +237,7 @@ ispy.addToScene = function(event, view) {
         
 	    }
 	    
-	    const solidbox_material = new THREE.MeshBasicMaterial({
+	    const solidbox_material = new MeshBasicMaterial({
 		color:ocolor,
 		transparent: transp,
 		opacity:descr.style.opacity,
@@ -238,10 +245,10 @@ ispy.addToScene = function(event, view) {
 		depthWrite: false
 	    });
 	    
-	    solidbox_material.side = THREE.DoubleSide;
+	    solidbox_material.side = DoubleSide;
 	    
-	    const smeshes = new THREE.Mesh(
-		THREE.BufferGeometryUtils.mergeBufferGeometries(sboxes),
+	    const smeshes = new Mesh(
+		BufferGeometryUtils.mergeBufferGeometries(sboxes),
 		solidbox_material
 	    );
 
@@ -250,15 +257,15 @@ ispy.addToScene = function(event, view) {
 
 	    if ( slines.length > 0 ) {
 	    
-		const sline_material = new THREE.LineBasicMaterial({
+		const sline_material = new LineBasicMaterial({
                     color:0xcccccc,
                     transparent: false,
                     linewidth:1,
                     depthTest: false  
                 });
 
-		const sline_mesh = new THREE.LineSegments(
-		    THREE.BufferGeometryUtils.mergeBufferGeometries(slines),
+		const sline_mesh = new LineSegments(
+		    BufferGeometryUtils.mergeBufferGeometries(slines),
 		    sline_material
 		);
 
@@ -291,16 +298,16 @@ ispy.addToScene = function(event, view) {
 
 	    if ( ss_boxes.length > 0 ) {
 
-		const ssb_material = new THREE.MeshBasicMaterial({
+		const ssb_material = new MeshBasicMaterial({
 		    color:ocolor, 
 		    transparent: transp,
 		    opacity:descr.style.opacity
 		});
 	    
-		ssb_material.side = THREE.DoubleSide;
+		ssb_material.side = DoubleSide;
 		
-		const ssb_meshes = new THREE.Mesh(
-		    THREE.BufferGeometryUtils.mergeBufferGeometries(ss_boxes),
+		const ssb_meshes = new Mesh(
+		    BufferGeometryUtils.mergeBufferGeometries(ss_boxes),
 		    ssb_material
 		);
 
@@ -333,16 +340,16 @@ ispy.addToScene = function(event, view) {
 
 	    if ( sst_boxes.length > 0 ) {
 
-		const sst_material = new THREE.MeshBasicMaterial({
+		const sst_material = new MeshBasicMaterial({
 		    color:ocolor, 
 		    transparent: transp,
 		    opacity:descr.style.opacity
 		});
 	    
-		sst_material.side = THREE.DoubleSide;
+		sst_material.side = DoubleSide;
 
-		var sst_meshes = new THREE.Mesh(
-		    THREE.BufferGeometryUtils.mergeBufferGeometries(sst_boxes),
+		var sst_meshes = new Mesh(
+		    BufferGeometryUtils.mergeBufferGeometries(sst_boxes),
 		    sst_material
 		);
 	    
@@ -364,28 +371,28 @@ ispy.addToScene = function(event, view) {
 
 	    }
 
-	    const ematerial = new THREE.MeshBasicMaterial({
-		    color: new THREE.Color(descr.style.ecolor),
+	    const ematerial = new MeshBasicMaterial({
+		    color: new Color(descr.style.ecolor),
 		    transparent: transp,
 		    opacity: descr.style.opacity
 		});
 
-	    const hmaterial = new THREE.MeshBasicMaterial({
-		    color: new THREE.Color(descr.style.hcolor),
+	    const hmaterial = new MeshBasicMaterial({
+		    color: new Color(descr.style.hcolor),
                     transparent: transp,
                     opacity: descr.style.opacity
 		});
 	    
-	    ematerial.side = THREE.DoubleSide;
-	    hmaterial.side = THREE.DoubleSide;
+	    ematerial.side = DoubleSide;
+	    hmaterial.side = DoubleSide;
 
-	    const emeshes = new THREE.Mesh(
-		THREE.BufferGeometryUtils.mergeBufferGeometries(eboxes),
+	    const emeshes = new Mesh(
+		BufferGeometryUtils.mergeBufferGeometries(eboxes),
 		ematerial
 	    );
 	    
-	    const hmeshes = new THREE.Mesh(
-		THREE.BufferGeometryUtils.mergeBufferGeometries(hboxes),
+	    const hmeshes = new Mesh(
+		BufferGeometryUtils.mergeBufferGeometries(hboxes),
 		hmaterial
 	    );
 
@@ -436,9 +443,9 @@ ispy.addToScene = function(event, view) {
 
 	case ispy.POINT:
 	    
-	    const points = new THREE.Points(
+	    const points = new Points(
 		descr.fn(data),
-		new THREE.PointsMaterial({
+		new PointsMaterial({
 		    color:ocolor, 
 		    size:descr.style.size
 		}));
@@ -490,7 +497,7 @@ ispy.addToScene = function(event, view) {
 
 		    if ( ispy.use_line2 ) {
 		    
-			const line2 = new THREE.Line2(g, new THREE.LineMaterial({
+			const line2 = new Line2(g, new LineMaterial({
 			    color:ocolor,
 			    transparent:transp,
 			    linewidth:descr.style.linewidth*0.001,
@@ -509,7 +516,7 @@ ispy.addToScene = function(event, view) {
 
 		    } else {
 			
-			const line = new THREE.Line(g, new THREE.LineBasicMaterial({
+			const line = new Line(g, new LineBasicMaterial({
 			    color:ocolor,
 			    transparent:transp,
 			    opacity:descr.style.opacity

@@ -1,3 +1,5 @@
+import ispy from './ispy-state.js';
+
 // Hmmm, IIRC objects are unordered. However, at least Chrome and Firefox fetch things in
 // the reverse order than specified here. Therefore e.g. Tracker appears at the top of
 // row of the tree view and CSC at the bottom. Which is what we want.

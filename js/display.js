@@ -1,3 +1,6 @@
+import ispy from './ispy-state.js';
+import { Color, TrackballControls, Vector2 } from './three-imports.js';
+
 ispy.invertColors = function() {
 
     ispy.inverted_colors = ! ispy.inverted_colors;
@@ -119,7 +122,7 @@ ispy.updateRenderer = function(type) {
 
     ispy.useRenderer(type);
 
-    var controls = new THREE.TrackballControls(ispy.camera, ispy.renderer.domElement);
+    var controls = new TrackballControls(ispy.camera, ispy.renderer.domElement);
     controls.rotateSpeed = 3.0;
     controls.zoomSpeed = 0.5;
     ispy.controls = controls;
@@ -187,7 +190,7 @@ ispy.onMouseMove = function(e) {
     const offsetX = display.getBoundingClientRect().left + window.pageXOffset - left;
     const offsetY = display.getBoundingClientRect().top + window.pageYOffset - top;
 
-    const pointer = new THREE.Vector2();
+    const pointer = new Vector2();
     
     pointer.x = ((e.clientX-offsetX) / w)*2 - 1;
     pointer.y = -((e.clientY-offsetY) / h)*2 +1;
@@ -205,7 +208,7 @@ ispy.onMouseMove = function(e) {
 
 	if ( ! ispy.intersected.selected ) {
 	
-	    const original_color = new THREE.Color(
+	    const original_color = new Color(
 		ispy.event_description[ispy.current_view][ispy.intersected.name].style.color
 	    );
 
@@ -267,7 +270,7 @@ ispy.onMouseDown = function(e) {
 
 	    if ( ispy.intersected.selected ) {
 	    
-		const original_color = new THREE.Color(
+		const original_color = new Color(
 		    ispy.event_description[ispy.current_view][ispy.intersected.name].style.color
 		);
 		
@@ -370,7 +373,7 @@ document.addEventListener('keydown', function(e) {
 
 	if ( ispy.intersected && ispy.intersected.name.includes('Jet') ) {
 
-	    ispy.intersected.material.color = new THREE.Color(
+	    ispy.intersected.material.color = new Color(
 		ispy.event_description[ispy.current_view][ispy.intersected.name].style.color
 	    );
 

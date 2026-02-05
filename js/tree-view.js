@@ -1,3 +1,6 @@
+import ispy from './ispy-state.js';
+import { Color } from './three-imports.js';
+
 ispy.addGroups = function() {
 
     ispy.gui.addFolder("Detector");
@@ -96,14 +99,14 @@ ispy.showObject = function(key, view, show) {
 ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 
     let opacity = 1.0;
-    let color = new THREE.Color();
+    let color = new Color();
     let linewidth = 1;
     let min_pt = 1.0;
     let min_et = 1.0;
     let min_energy = 1.0;
     let nobjects = 0;
 
-    view = '3D';
+    const view = '3D';
     
     if ( ispy.detector_description[view].hasOwnProperty(key) ) {
 
@@ -377,13 +380,13 @@ ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 		    
 			oc.children.forEach(function(og) {
 
-			    og.material.color = new THREE.Color(row_obj.color);
+			    og.material.color = new Color(row_obj.color);
 
 			});
 		    
 		    } else {
 		
-			oc.material.color = new THREE.Color(row_obj.color);
+			oc.material.color = new Color(row_obj.color);
 			
 		    }
 		    

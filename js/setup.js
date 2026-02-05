@@ -1,6 +1,16 @@
+import ispy from './ispy-state.js';
+import {
+    ArrowHelper, DirectionalLight, FontLoader, Group, Mesh, MeshBasicMaterial,
+    Object3D, OrthographicCamera, PerspectiveCamera, Plane, Raycaster, REVISION,
+    Scene, TextGeometry, Vector3, WebGLRenderer
+} from './three-imports.js';
+import { OrbitControls, SVGRenderer, TrackballControls } from './three-imports.js';
+import Stats from 'stats.js';
+import * as dat from 'dat.gui';
+
 ispy.lookAtOrigin = function() {
 
-    ispy.camera.lookAt(new THREE.Vector3(0,0,0));
+    ispy.camera.lookAt(new Vector3(0,0,0));
 
 };
 
@@ -49,7 +59,7 @@ ispy.initCamera = function() {
     ispy.camera.position.z = 13.0;
 
     ispy.camera.zoom = 2.0;
-    ispy.camera.up = new THREE.Vector3(0,1,0);
+    ispy.camera.up = new Vector3(0,1,0);
     
     ispy.camera.updateProjectionMatrix();
     ispy.lookAtOrigin();
@@ -62,8 +72,8 @@ ispy.useRenderer = function(type) {
     const height = document.getElementById('display').clientHeight;
 
     const rendererTypes = {
-	'WebGLRenderer': THREE.WebGLRenderer,
-	'SVGRenderer': THREE.SVGRenderer
+	'WebGLRenderer': WebGLRenderer,
+	'SVGRenderer': SVGRenderer
     };
 
     const renderer = new rendererTypes[type]({antialias:true, alpha:true});
@@ -150,15 +160,15 @@ ispy.setupClipping = function() {
     };
 
     ispy.local_planes = [
-	new THREE.Plane(new THREE.Vector3(-1,0,0), local_params.planeX.constant),
-	new THREE.Plane(new THREE.Vector3(0,-1,0), local_params.planeY.constant),
-	new THREE.Plane(new THREE.Vector3(0,0,-1), local_params.planeZ.constant)
+	new Plane(new Vector3(-1,0,0), local_params.planeX.constant),
+	new Plane(new Vector3(0,-1,0), local_params.planeY.constant),
+	new Plane(new Vector3(0,0,-1), local_params.planeZ.constant)
     ];
     
     ispy.global_planes = [
-	new THREE.Plane(new THREE.Vector3(-1,0,0), global_params.planeX.constant),
-	new THREE.Plane(new THREE.Vector3(0,-1,0), global_params.planeY.constant),
-	new THREE.Plane(new THREE.Vector3(0,0,-1), global_params.planeZ.constant)
+	new Plane(new Vector3(-1,0,0), global_params.planeX.constant),
+	new Plane(new Vector3(0,-1,0), global_params.planeY.constant),
+	new Plane(new Vector3(0,0,-1), global_params.planeZ.constant)
     ];
     
     ispy.renderer.clippingPlanes = ispy.global_planes;
@@ -253,25 +263,25 @@ ispy.setupGUIs = function() {
 
 ispy.setupInset = function(height) {
     
-    const inset_scene = new THREE.Scene();
+    const inset_scene = new Scene();
     ispy.inset_scene = inset_scene;
 
     // fov, aspect, near, far
     const inset_width = height/5;
     const inset_height = height/5;
-    const inset_camera = new THREE.PerspectiveCamera(70, inset_width / inset_height, 1, 100);
+    const inset_camera = new PerspectiveCamera(70, inset_width / inset_height, 1, 100);
     ispy.inset_camera = inset_camera;
     ispy.inset_camera.up = ispy.camera.up;
     
-    const origin = new THREE.Vector3(0,0,0);
+    const origin = new Vector3(0,0,0);
 
     // dir, origin, length, hex, headLength, headWidth
     const length = 3.5;
     const headLength = 1;
     const headWidth = 1;
     
-    const rx = new THREE.ArrowHelper(
-	new THREE.Vector3(4,0,0),
+    const rx = new ArrowHelper(
+	new Vector3(4,0,0),
 	origin,
 	length,
 	0xff0000,
@@ -279,8 +289,8 @@ ispy.setupInset = function(height) {
 	headWidth
     );
 
-    const gy = new THREE.ArrowHelper(
-	new THREE.Vector3(0,4,0),
+    const gy = new ArrowHelper(
+	new Vector3(0,4,0),
 	origin,
 	length,
 	0x00ff00,
@@ -288,8 +298,8 @@ ispy.setupInset = function(height) {
 	headWidth
     );
 
-    const bz = new THREE.ArrowHelper(
-	new THREE.Vector3(0,0,4),
+    const bz = new ArrowHelper(
+	new Vector3(0,0,4),
 	origin,
 	length,
 	0x0000ff,
@@ -305,28 +315,28 @@ ispy.setupInset = function(height) {
     ispy.inset_scene.add(gy);
     ispy.inset_scene.add(bz);
 				
-    const font_loader = new THREE.FontLoader();
+    const font_loader = new FontLoader();
     
     font_loader.load('./fonts/helvetiker_regular.typeface.json', function(font) {
 
 	const tps = {size:0.75, height:0.1, font:font};
 	
-	const x_geo = new THREE.TextGeometry('X', tps);
-	const y_geo = new THREE.TextGeometry('Y', tps);
-	const z_geo = new THREE.TextGeometry('Z', tps);
+	const x_geo = new TextGeometry('X', tps);
+	const y_geo = new TextGeometry('Y', tps);
+	const z_geo = new TextGeometry('Z', tps);
 
-	const x_material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-	const x_text = new THREE.Mesh(x_geo, x_material);
+	const x_material = new MeshBasicMaterial({ color: 0xff0000 });
+	const x_text = new Mesh(x_geo, x_material);
 	x_text.position.x = length+headLength;
 	x_text.name = 'xtext';
 
-	const y_material = new THREE.MeshBasicMaterial({ color: 0x00ff00});
-	const y_text = new THREE.Mesh(y_geo, y_material);
+	const y_material = new MeshBasicMaterial({ color: 0x00ff00});
+	const y_text = new Mesh(y_geo, y_material);
 	y_text.position.y = length+headLength;
 	y_text.name = 'ytext';
 	    
-	const z_material = new THREE.MeshBasicMaterial({ color: 0x0000ff});
-	const z_text = new THREE.Mesh(z_geo, z_material);
+	const z_material = new MeshBasicMaterial({ color: 0x0000ff});
+	const z_text = new Mesh(z_geo, z_material);
 	z_text.position.z = length+headLength;
 	z_text.name = 'ztext';
 
@@ -441,9 +451,9 @@ ispy.init = function() {
     const inset = document.getElementById('axes');
 
     ispy.scenes = {
-	'3D': new THREE.Scene(),
-	'RPhi': new THREE.Scene(),
-	'RhoZ': new THREE.Scene()
+	'3D': new Scene(),
+	'RPhi': new Scene(),
+	'RhoZ': new Scene()
     };
 
     ispy.views = ['3D', 'RPhi', 'RhoZ'];
@@ -460,7 +470,7 @@ ispy.init = function() {
     const width = display.clientWidth;
     const height = display.clientHeight;
     
-    ispy.p_camera = new THREE.PerspectiveCamera(
+    ispy.p_camera = new PerspectiveCamera(
 	75,
 	width/height,
 	0.1,
@@ -469,7 +479,7 @@ ispy.init = function() {
 
     ispy.p_camera.name = 'PerspectiveCamera';
 
-    ispy.o_camera = new THREE.OrthographicCamera(
+    ispy.o_camera = new OrthographicCamera(
 	width / -2,
 	width / 2,
 	height / 2,
@@ -484,14 +494,15 @@ ispy.init = function() {
     ispy.camera = ispy.is_perspective ? ispy.p_camera : ispy.o_camera;
     ispy.initCamera();
     
-    ispy.velocity = new THREE.Vector3(0, 0, 0);
-    ispy.acceleration = new THREE.Vector3(0, 0, 0);
+    ispy.velocity = new Vector3(0, 0, 0);
+    ispy.acceleration = new Vector3(0, 0, 0);
 
     ispy.setupInset(height);
     
     ispy.useRenderer('WebGLRenderer', width, height);
   
     ispy.stats = new Stats();
+    ispy.stats.domElement.id = 'stats';
     display.appendChild(ispy.stats.domElement);
 
     ispy.setupGUIs();    
@@ -501,14 +512,14 @@ ispy.init = function() {
 
     // The second argument is necessary to make sure that mouse events are
     // handled only when in the canvas
-    ispy.tcontrols = new THREE.TrackballControls(ispy.camera, ispy.renderer.domElement);
+    ispy.tcontrols = new TrackballControls(ispy.camera, ispy.renderer.domElement);
     ispy.tcontrols.rotateSpeed = 3.0;
     ispy.tcontrols.zoomSpeed = 0.5;
     ispy.tcontrols.dynamicDampingFactor = 1.0;
     ispy.tcontrols.noRotate = false;
     ispy.tcontrols.noPan = false;
     
-    ispy.ocontrols = new THREE.OrbitControls(ispy.camera, ispy.renderer.domElement);
+    ispy.ocontrols = new OrbitControls(ispy.camera, ispy.renderer.domElement);
     ispy.ocontrols.enableRotate = true;
 
     ispy.controls = ispy.ocontrols;
@@ -517,7 +528,7 @@ ispy.init = function() {
 
 	['Detector', 'Imported'].concat(ispy.data_groups).forEach(g => {
 
-	    let obj_group = new THREE.Group();
+	    let obj_group = new Group();
 	    obj_group.name = g;
 	    ispy.scenes[v].add(obj_group);
 	   
@@ -526,14 +537,14 @@ ispy.init = function() {
     });
 
     document.getElementById('version').innerHTML = ispy.version;
-    document.getElementById('threejs').innerHTML = "r"+THREE.REVISION;
+    document.getElementById('threejs').innerHTML = "r"+REVISION;
     
     window.addEventListener('resize', ispy.onWindowResize, false);
 
     ispy.get_image_data = false;
     ispy.image_data = null;
     
-    ispy.raycaster = new THREE.Raycaster();
+    ispy.raycaster = new Raycaster();
     ispy.raycaster.layers.set(2);
 
     ispy.intersected = null;
@@ -566,16 +577,16 @@ ispy.initLight = function() {
     const intensity = 1.0;
     const length = 15.0;
     
-    const lights = new THREE.Object3D();
+    const lights = new Object3D();
     lights.name = 'Lights';
     ispy.scene.add(lights);
     
-    ispy.light1 = new THREE.DirectionalLight(0xffffff, intensity);
+    ispy.light1 = new DirectionalLight(0xffffff, intensity);
     ispy.light1.name = 'Light1';
     ispy.light1.position.set(-length, length, length);
     ispy.scene.getObjectByName('Lights').add(ispy.light1);
     
-    ispy.light2 = new THREE.DirectionalLight(0xffffff, intensity);
+    ispy.light2 = new DirectionalLight(0xffffff, intensity);
     ispy.light2.name = 'Light2';
     ispy.light2.position.set(length, -length, -length);
     ispy.scene.getObjectByName('Lights').add(ispy.light2);
