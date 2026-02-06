@@ -7,6 +7,7 @@ import {
 import { OrbitControls, SVGRenderer, TrackballControls } from './three-imports.js';
 import Stats from 'stats.js';
 import * as dat from 'dat.gui';
+import TWEEN from './lib/tween.min.js';
 
 ispy.lookAtOrigin = function() {
 
