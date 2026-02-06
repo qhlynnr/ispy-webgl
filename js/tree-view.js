@@ -243,7 +243,7 @@ ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 		    
 		    obj.children.forEach(function(o) {
 	    
-			o.material.linewidth = row_obj.linewidth*0.001;
+			o.material.linewidth = row_obj.linewidth;
 	    
 		    });
 
@@ -270,7 +270,7 @@ ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 		    
 		    obj.children.forEach(function(o) {
 	    
-			o.material.linewidth = row_obj.linewidth*0.001;
+			o.material.linewidth = row_obj.linewidth;
 	    
 		    });
 

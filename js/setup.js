@@ -320,7 +320,7 @@ ispy.setupInset = function(height) {
     
     font_loader.load('./fonts/helvetiker_regular.typeface.json', function(font) {
 
-	const tps = {size:0.75, height:0.1, font:font};
+	const tps = {size:0.75, depth:0.1, font:font};
 	
 	const x_geo = new TextGeometry('X', tps);
 	const y_geo = new TextGeometry('Y', tps);

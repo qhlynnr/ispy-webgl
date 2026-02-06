@@ -5,6 +5,13 @@ import {
     Points, PointsMaterial
 } from './three-imports.js';
 
+// Helper to create LineMaterial with resolution set (required for Line2 in Three.js r150+)
+function createLineMaterial(params) {
+    const material = new LineMaterial(params);
+    material.resolution.set(window.innerWidth, window.innerHeight);
+    return material;
+}
+
 ispy.addDetector = function() {
 
     for ( let key in ispy.detector_description ) {
@@ -58,7 +65,7 @@ ispy.addDetector = function() {
 	    }
 	    
 	    let box = new LineSegments(
-		BufferGeometryUtils.mergeBufferGeometries(box_geometries),
+		BufferGeometryUtils.mergeGeometries(box_geometries),
 		box_material
 	    );
 	    
@@ -96,7 +103,7 @@ ispy.addDetector = function() {
 	    }
 
 	    let meshes = new Mesh(
-		BufferGeometryUtils.mergeBufferGeometries(boxes),
+		BufferGeometryUtils.mergeGeometries(boxes),
 		solidbox_material
 	    );
 
@@ -112,7 +119,7 @@ ispy.addDetector = function() {
 		});
 
 	    let line_mesh = new LineSegments(
-		BufferGeometryUtils.mergeBufferGeometries(lines),
+		BufferGeometryUtils.mergeGeometries(lines),
 		line_material
 	    );
 
@@ -203,7 +210,7 @@ ispy.addToScene = function(event, view) {
 	    }
 
 	    const line = new LineSegments(
-		BufferGeometryUtils.mergeBufferGeometries(boxes),
+		BufferGeometryUtils.mergeGeometries(boxes),
 		new LineBasicMaterial({
 		    color:ocolor, 
 		    transparent: transp,
@@ -248,7 +255,7 @@ ispy.addToScene = function(event, view) {
 	    solidbox_material.side = DoubleSide;
 	    
 	    const smeshes = new Mesh(
-		BufferGeometryUtils.mergeBufferGeometries(sboxes),
+		BufferGeometryUtils.mergeGeometries(sboxes),
 		solidbox_material
 	    );
 
@@ -265,7 +272,7 @@ ispy.addToScene = function(event, view) {
                 });
 
 		const sline_mesh = new LineSegments(
-		    BufferGeometryUtils.mergeBufferGeometries(slines),
+		    BufferGeometryUtils.mergeGeometries(slines),
 		    sline_material
 		);
 
@@ -307,7 +314,7 @@ ispy.addToScene = function(event, view) {
 		ssb_material.side = DoubleSide;
 		
 		const ssb_meshes = new Mesh(
-		    BufferGeometryUtils.mergeBufferGeometries(ss_boxes),
+		    BufferGeometryUtils.mergeGeometries(ss_boxes),
 		    ssb_material
 		);
 
@@ -349,7 +356,7 @@ ispy.addToScene = function(event, view) {
 		sst_material.side = DoubleSide;
 
 		var sst_meshes = new Mesh(
-		    BufferGeometryUtils.mergeBufferGeometries(sst_boxes),
+		    BufferGeometryUtils.mergeGeometries(sst_boxes),
 		    sst_material
 		);
 	    
@@ -387,12 +394,12 @@ ispy.addToScene = function(event, view) {
 	    hmaterial.side = DoubleSide;
 
 	    const emeshes = new Mesh(
-		BufferGeometryUtils.mergeBufferGeometries(eboxes),
+		BufferGeometryUtils.mergeGeometries(eboxes),
 		ematerial
 	    );
 	    
 	    const hmeshes = new Mesh(
-		BufferGeometryUtils.mergeBufferGeometries(hboxes),
+		BufferGeometryUtils.mergeGeometries(hboxes),
 		hmaterial
 	    );
 
@@ -497,10 +504,10 @@ ispy.addToScene = function(event, view) {
 
 		    if ( ispy.use_line2 ) {
 		    
-			const line2 = new Line2(g, new LineMaterial({
+			const line2 = new Line2(g, createLineMaterial({
 			    color:ocolor,
 			    transparent:transp,
-			    linewidth:descr.style.linewidth*0.001,
+			    linewidth:descr.style.linewidth,
 			    opacity:descr.style.opacity
 			}));
             

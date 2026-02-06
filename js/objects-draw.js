@@ -3,8 +3,15 @@ import {
     ArrowHelper, BufferAttribute, BufferGeometry, Color, CubicBezierCurve3,
     CylinderGeometry, DoubleSide, EdgesGeometry, Line, Line2, LineBasicMaterial,
     LineDashedMaterial, LineGeometry, LineMaterial, LineSegments, Matrix4, Mesh,
-    MeshBasicMaterial, Object3D, RingGeometry, SphereGeometry, Vector3
+    MeshBasicMaterial, Object3D, RingGeometry, SphereGeometry, Vector2, Vector3
 } from './three-imports.js';
+
+// Helper to create LineMaterial with resolution set (required for Line2 in Three.js r150+)
+function createLineMaterial(params) {
+    const material = new LineMaterial(params);
+    material.resolution.set(window.innerWidth, window.innerHeight);
+    return material;
+}
 
 ispy.makeWireframeBox = function(data, ci) {
 
@@ -899,7 +906,7 @@ ispy.makeTrackPointsRZ = function(data, extra, assoc, style, selection) {
 	
 	if ( ispy.use_line2 ) {
 
-	    positions[mi].push(projectPoint(...extra[pi][0], lps[mi]));
+	    positions[mi].push(...projectPoint(extra[pi][0], lps[mi]));
 
 	} else {
 	    
@@ -920,9 +927,9 @@ ispy.makeTrackPointsRZ = function(data, extra, assoc, style, selection) {
 	
 	    const line2 = new Line2(
 		new LineGeometry().setPositions(positions[k]),
-		new LineMaterial({
+		createLineMaterial({
 		    color: tcolor,
-		    linewidth: style.linewidth*0.001,
+		    linewidth: style.linewidth,
 		    transparent: transp,
 		    opacity:style.opacity
 		})
@@ -1002,9 +1009,9 @@ ispy.makeTrackPoints = function(data, extra, assoc, style, selection) {
 	
 	    const line2 = new Line2(
 		new LineGeometry().setPositions(positions[k]),
-		new LineMaterial({
+		createLineMaterial({
 		    color: tcolor,
-		    linewidth: style.linewidth*0.001,
+		    linewidth: style.linewidth,
 		    transparent: transp,
 		    opacity:style.opacity
 		})
@@ -1242,11 +1249,11 @@ ispy.makeThickTracks = function(tracks, extras, assocs, style, selection) {
 	    curve.getPoints(32).forEach(function(p) { positions.push(p.x,p.y,p.z); });
 	    lg.setPositions(positions);
 
-	    let line = new Line2(lg, new LineMaterial({
+	    let line = new Line2(lg, createLineMaterial({
 		color:tcolor,
 		opacity:style.opacity,
 		transparent:transp,
-		linewidth:style.linewidth*0.001
+		linewidth:style.linewidth
 	    }));
 
 	    line.computeLineDistances();
@@ -1340,11 +1347,11 @@ ispy.makeThickTracksRZ = function(tracks, extras, assocs, style, selection) {
 	    curve.getPoints(32).forEach(function(p) { positions.push(p.x,p.y,p.z); });
 	    lg.setPositions(positions);
 
-	    let line = new Line2(lg, new LineMaterial({
+	    let line = new Line2(lg, createLineMaterial({
 		color:tcolor,
 		opacity:style.opacity,
 		transparent:transp,
-		linewidth:style.linewidth*0.001
+		linewidth:style.linewidth
 	    }));
 
 	    line.computeLineDistances();
@@ -1889,9 +1896,9 @@ ispy.makeArrowThick = function(dir, origin, length, color, displacement) {
 	new LineGeometry().setPositions(
 	    positions
 	),
-	new LineMaterial({
+	createLineMaterial({
 	    color: color,
-	    linewidth: 2*0.001
+	    linewidth: 2
 	})
     );
 
@@ -2345,10 +2352,10 @@ ispy.makePhoton = function(data, style, selection) {
 
 	// For some reason LineDashedMaterial doesn't
 	// work for Line2 so use this material
-	const ldm =  new LineMaterial({
+	const ldm =  createLineMaterial({
 	    color: color,
 	    dashed: true,
-	    linewidth: style.linewidth*0.001,
+	    linewidth: style.linewidth,
 	    dashSize: 0.1,
 	    gapSize: 0.1
 	});
@@ -2440,10 +2447,10 @@ ispy.makePhotonRZ = function(data, style, selection) {
 
 	// For some reason LineDashedMaterial doesn't
 	// work for Line2 so use this material
-	const ldm =  new LineMaterial({
+	const ldm =  createLineMaterial({
 	    color: color,
 	    dashed: true,
-	    linewidth: style.linewidth*0.001,
+	    linewidth: style.linewidth,
 	    dashSize: 0.1,
 	    gapSize: 0.1
 	});
