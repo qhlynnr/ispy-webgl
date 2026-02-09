@@ -1,6 +1,6 @@
 import ispy from './ispy-state.js';
 ispy.detector = {"Collections":{}};
-ispy.version = "v1.0.2-rc";
+ispy.version = "2.0.0";
 
 // These need to be defined before adding objects:
 ispy.POINT = 0;
