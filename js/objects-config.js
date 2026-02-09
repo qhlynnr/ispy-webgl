@@ -66,15 +66,15 @@ ispy.detector_description = {
 	},
 	"EcalEndcapMinus3D_V1": {
 	    type: ispy.BOX, on: false, group: "Detector", name: "ECAL Endcap (-)",
-	    fn: ispy.makeEcal, style: {color: "rgb(50%, 80%, 100%)", opacity: 0.05, linewidth: 0.5}
+	    fn: ispy.makeEcal, style: {color: "#7fccff", opacity: 0.05, linewidth: 0.5}
 	},
 	"EcalEndcapPlus3D_V1": {
 	    type: ispy.BOX, on: false, group: "Detector", name: "ECAL Endcap (+)",
-	    fn: ispy.makeEcal, style: {color: "rgb(50%, 80%, 100%)", opacity: 0.05, linewidth: 0.5}
+	    fn: ispy.makeEcal, style: {color: "#7fccff", opacity: 0.05, linewidth: 0.5}
 	},	
 	"EcalBarrel3D_V1": {
 	    type: ispy.BOX, on: true, group: "Detector", name: "ECAL Barrel",
-	    fn: ispy.makeEcal, style: {color: "rgb(50%, 80%, 100%)", opacity: 0.01, linewidth: 0.5}
+	    fn: ispy.makeEcal, style: {color: "#7fccff", opacity: 0.01, linewidth: 0.5}
 	},
 	"SiStripTECMinus3D_V1": {
 	    type: ispy.BOX, on: false, group: "Detector", name: "Tracker Endcap (-)",
@@ -143,7 +143,7 @@ ispy.detector_description = {
 	},
 	"EcalBarrelRPhi_V1": {
 	    type: ispy.BOX, on: true, group: "Detector", name: "ECAL Barrel RPhi",
-	    fn: ispy.makeEcal, style: {color: "rgb(50%, 80%, 100%)", opacity: 0.75, linewidth: 1.0}
+	    fn: ispy.makeEcal, style: {color: "#7fccff", opacity: 0.75, linewidth: 1.0}
 	},
 	"TrackerRPhi_V1": {
 	    type: ispy.BOX, on: true, group: "Detector", name:"Tracker RPhi",
@@ -184,11 +184,11 @@ ispy.detector_description = {
 	},	
 	"EcalEndcapRZ_V1": {
 	    type: ispy.BOX, on: true, group: "Detector", name: "ECAL Endcap RZ",
-	    fn: ispy.makeEcal, style: {color: "rgb(50%, 80%, 100%)", opacity: 0.75, linewidth: 1.0}
+	    fn: ispy.makeEcal, style: {color: "#7fccff", opacity: 0.75, linewidth: 1.0}
 	},
 	"EcalBarrelRZ_V1": {
 	    type: ispy.BOX, on: true, group: "Detector", name: "ECAL Barrel RZ",
-	    fn: ispy.makeEcal, style: {color: "rgb(50%, 80%, 100%)", opacity: 0.75, linewidth: 1.0}
+	    fn: ispy.makeEcal, style: {color: "#7fccff", opacity: 0.75, linewidth: 1.0}
 	},
 	"TrackerRZ_V1": {
 	    type: ispy.BOX, on: true, group: "Detector", name:"Tracker RZ",

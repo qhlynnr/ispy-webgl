@@ -1,5 +1,5 @@
 import ispy from './ispy-state.js';
-import { GLTFLoader, Line, Mesh, MTLLoader, OBJLoader } from './three-imports.js';
+import { Color, GLTFLoader, Line, Mesh, MTLLoader, OBJLoader } from './three-imports.js';
 import JSZip from 'jszip';
 import { Modal } from 'bootstrap';
 
@@ -1095,8 +1095,17 @@ ispy.importDetector = function() {
 			c.renderOrder = 1;
 
 			if ( c.material ) {
-			    
+
 			    c.material.clippingPlanes = ispy.local_planes;
+
+			    // Apply color from detector_description to filled meshes only
+			    // (preserve white color for line outlines)
+			    if (c instanceof Mesh) {
+				const desc = ispy.detector_description[g.view] && ispy.detector_description[g.view][g.id];
+				if (desc && desc.style && desc.style.color) {
+				    c.material.color = new Color(desc.style.color);
+				}
+			    }
 
 			}
 			

@@ -36,7 +36,6 @@ export {
 export * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 export { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 export { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-export { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 export { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 export { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';

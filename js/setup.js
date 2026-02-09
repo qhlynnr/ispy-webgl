@@ -4,7 +4,7 @@ import {
     Object3D, OrthographicCamera, PerspectiveCamera, Plane, Raycaster, REVISION,
     Scene, TextGeometry, Vector3, WebGLRenderer
 } from './three-imports.js';
-import { OrbitControls, SVGRenderer, TrackballControls } from './three-imports.js';
+import { OrbitControls, TrackballControls } from './three-imports.js';
 import Stats from 'stats.js';
 import * as dat from 'dat.gui';
 import TWEEN from './lib/tween.min.js';
@@ -72,13 +72,8 @@ ispy.useRenderer = function(type) {
     const width = document.getElementById('display').clientWidth;
     const height = document.getElementById('display').clientHeight;
 
-    const rendererTypes = {
-	'WebGLRenderer': WebGLRenderer,
-	'SVGRenderer': SVGRenderer
-    };
-
-    const renderer = new rendererTypes[type]({antialias:true, alpha:true});
-    const inset_renderer = new rendererTypes[type]({antialias:true, alpha:true});
+    const renderer = new WebGLRenderer({antialias:true, alpha:true});
+    const inset_renderer = new WebGLRenderer({antialias:true, alpha:true});
 
     renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
     inset_renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);

@@ -1,5 +1,5 @@
 import ispy from './ispy-state.js';
-import { Color, TrackballControls, Vector2 } from './three-imports.js';
+import { Color, Vector2 } from './three-imports.js';
 
 ispy.invertColors = function() {
 
@@ -98,38 +98,6 @@ ispy.updateRendererInfo = function() {
 
 };
 
-ispy.updateRenderer = function(type) {
-
-    if ( type === ispy.renderer_name ) {
-	
-	alert(type + ' is already in use');
-	return;
-  
-    }
-
-    if ( type === 'WebGLRenderer' ) {
-    
-	if ( ! ispy.hasWebGL() ) {
-      
-	    alert('WebGL is not available');
-    
-	}
-  
-    }
-
-    document.getElementById('display').removeChild(ispy.renderer.domElement);
-    document.getElementById('axes').removeChild(ispy.inset_renderer.domElement);
-
-    ispy.useRenderer(type);
-
-    var controls = new TrackballControls(ispy.camera, ispy.renderer.domElement);
-    controls.rotateSpeed = 3.0;
-    controls.zoomSpeed = 0.5;
-    ispy.controls = controls;
-    
-    ispy.updateRendererInfo();
-
-};
 
 ispy.onWindowResize = function() {
 
