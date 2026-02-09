@@ -580,10 +580,11 @@ ispy.loadOBJ = function(contents, name) {
     object.name = name;
 
     object.children.forEach(function(c) {
-    
+
 	    c.material.transparency = true;
 	    c.material.opacity = ispy.importTransparency;
-  
+	    c.renderOrder = -1;
+
 	});
 
     ispy.scene.getObjectByName("Imported").add(object);
@@ -635,7 +636,8 @@ ispy.loadOBJMTL = function(obj, mtl_file, name) {
 			    o.material = material;
 			    o.material.transparent = true;
 			    o.material.opacity = ispy.importTransparency;
-			    
+			    o.renderOrder = -1;
+
 			}
 		    }
 		}
@@ -756,7 +758,8 @@ ispy.loadSelectedGLTF = function() {
 	    object.children.forEach(function(c) {
 
 		c.material.clippingPlanes = ispy.local_planes;
-			
+		c.renderOrder = -1;
+
 	    });
 
 	    ispy.scene.getObjectByName('Imported').add(object);
@@ -807,11 +810,12 @@ ispy.loadOBJMTL_new = function(obj_file, mtl_file, id, name, group, show) {
 	    ispy.disabled[object.name] = false;
 	    
 	    object.children.forEach(function(c) {
-        
+
 		c.material.transparent = true;
 		c.material.opacity = ispy.importTransparency;
 		c.material.clippingPlanes = ispy.local_planes;
-      
+		c.renderOrder = -1;
+
 	    });
 
 	    ispy.scene.getObjectByName(group).add(object);

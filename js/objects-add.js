@@ -212,14 +212,16 @@ ispy.addToScene = function(event, view) {
 	    const line = new LineSegments(
 		BufferGeometryUtils.mergeGeometries(boxes),
 		new LineBasicMaterial({
-		    color:ocolor, 
+		    color:ocolor,
 		    transparent: transp,
 		    linewidth:descr.style.linewidth,
-		    opacity:descr.style.opacity
+		    opacity:descr.style.opacity,
+		    depthTest: false
 		})
 	    );
 
 	    line.name = key;
+	    line.renderOrder = 2;
 	    ispy.scene.getObjectByName(key).add(line);
 
 	    break;
@@ -260,6 +262,7 @@ ispy.addToScene = function(event, view) {
 	    );
 
 	    smeshes.name = key;
+	    smeshes.renderOrder = 2;
 	    ispy.scene.getObjectByName(key).add(smeshes);
 
 	    if ( slines.length > 0 ) {
@@ -276,11 +279,12 @@ ispy.addToScene = function(event, view) {
 		    sline_material
 		);
 
-		sline_mesh.name = key;    
+		sline_mesh.name = key;
+		sline_mesh.renderOrder = 2;
 		ispy.scene.getObjectByName(key).add(sline_mesh);
 
 	    }
-	    
+
 	    break;
 
 	case ispy.SCALEDSOLIDBOX:
@@ -306,11 +310,12 @@ ispy.addToScene = function(event, view) {
 	    if ( ss_boxes.length > 0 ) {
 
 		const ssb_material = new MeshBasicMaterial({
-		    color:ocolor, 
+		    color:ocolor,
 		    transparent: transp,
-		    opacity:descr.style.opacity
+		    opacity:descr.style.opacity,
+		    depthTest: false
 		});
-	    
+
 		ssb_material.side = DoubleSide;
 		
 		const ssb_meshes = new Mesh(
@@ -319,10 +324,11 @@ ispy.addToScene = function(event, view) {
 		);
 
 		ssb_meshes.name = key;
+		ssb_meshes.renderOrder = 2;
 		ispy.scene.getObjectByName(key).add(ssb_meshes);
 
 	    }
-		
+
 	    break;
 
 	case ispy.SCALEDSOLIDTOWER:
@@ -348,11 +354,12 @@ ispy.addToScene = function(event, view) {
 	    if ( sst_boxes.length > 0 ) {
 
 		const sst_material = new MeshBasicMaterial({
-		    color:ocolor, 
+		    color:ocolor,
 		    transparent: transp,
-		    opacity:descr.style.opacity
+		    opacity:descr.style.opacity,
+		    depthTest: false
 		});
-	    
+
 		sst_material.side = DoubleSide;
 
 		var sst_meshes = new Mesh(
@@ -361,10 +368,11 @@ ispy.addToScene = function(event, view) {
 		);
 	    
 		sst_meshes.name = key;
+		sst_meshes.renderOrder = 2;
 		ispy.scene.getObjectByName(key).add(sst_meshes);
 
 	    }
-	    
+
 	    break;
 
 	case ispy.STACKEDTOWER:
@@ -381,15 +389,17 @@ ispy.addToScene = function(event, view) {
 	    const ematerial = new MeshBasicMaterial({
 		    color: new Color(descr.style.ecolor),
 		    transparent: transp,
-		    opacity: descr.style.opacity
+		    opacity: descr.style.opacity,
+		    depthTest: false
 		});
 
 	    const hmaterial = new MeshBasicMaterial({
 		    color: new Color(descr.style.hcolor),
-                    transparent: transp,
-                    opacity: descr.style.opacity
+		    transparent: transp,
+		    opacity: descr.style.opacity,
+		    depthTest: false
 		});
-	    
+
 	    ematerial.side = DoubleSide;
 	    hmaterial.side = DoubleSide;
 
@@ -405,14 +415,16 @@ ispy.addToScene = function(event, view) {
 
 	    emeshes.name = key;
 	    hmeshes.name = key;
+	    emeshes.renderOrder = 2;
+	    hmeshes.renderOrder = 2;
 
 	    if ( is_physics_obj && visible ) {
-		
+
 		emeshes.layers.enable(2);
 		hmeshes.layers.enable(2);
 
 	    }
-	    
+
 	    ispy.scene.getObjectByName(key).add(emeshes);
 	    ispy.scene.getObjectByName(key).add(hmeshes);
 
@@ -425,41 +437,48 @@ ispy.addToScene = function(event, view) {
 	    if ( objs !== undefined ) {
 
 		objs.forEach(function(obj, index) {
-		    
+
 		    // For event info we want each of the children to have the
 		    // same name as the parent. this is so picking on an object works
 		    obj.name = key;
+		    obj.renderOrder = 2;
+
+		    if ( obj.material ) {
+			obj.material.depthTest = false;
+		    }
 
 		    if ( is_physics_obj && visible ) {
 
 			obj.layers.enable(2);
 
 		    }
-		    
+
 		    // originalIndex works as a link between the original
 		    // data and THREE objects:
 		    obj.userData.originalIndex = index;
 		    objectIds.push(obj.id);
 		    ispy.scene.getObjectByName(key).add(obj);
-		    
+
 		});
-		
+
 	    }
-	    
+
 	    break;
 
 	case ispy.POINT:
-	    
+
 	    const points = new Points(
 		descr.fn(data),
 		new PointsMaterial({
-		    color:ocolor, 
-		    size:descr.style.size
+		    color:ocolor,
+		    size:descr.style.size,
+		    depthTest: false
 		}));
-	    
+
 	    points.name = key;
+	    points.renderOrder = 2;
 	    ispy.scene.getObjectByName(key).add(points);
-        
+
 	    break;
 
 	case ispy.SHAPE:
@@ -469,13 +488,19 @@ ispy.addToScene = function(event, view) {
 		const shape = descr.fn(data[si], descr.style, descr.selection);
           
 		if ( shape !== null ) {
-            
+
 		    shape.name = key;
+		    shape.renderOrder = 2;
 
 		    shape.traverse(function(s) {
 
 			s.name = key;
-			
+			s.renderOrder = 2;
+
+			if ( s.material ) {
+			    s.material.depthTest = false;
+			}
+
 			if ( is_physics_obj && visible ) {
 
 			    s.layers.enable(2);
@@ -503,37 +528,41 @@ ispy.addToScene = function(event, view) {
 		descr.fn(data[li]).forEach(function(g) {
 
 		    if ( ispy.use_line2 ) {
-		    
+
 			const line2 = new Line2(g, createLineMaterial({
 			    color:ocolor,
 			    transparent:transp,
 			    linewidth:descr.style.linewidth,
-			    opacity:descr.style.opacity
+			    opacity:descr.style.opacity,
+			    depthTest: false
 			}));
-            
+
 			line2.name = key;
+			line2.renderOrder = 2;
 			line2.computeLineDistances();
-            
+
 			// originalIndex works as a link between the original
 			// data and THREE objects:
-		    
+
 			line2.userData.originalIndex = li;
 			objectIds.push(line2.id);
 			ispy.scene.getObjectByName(key).add(line2);
 
 		    } else {
-			
+
 			const line = new Line(g, new LineBasicMaterial({
 			    color:ocolor,
 			    transparent:transp,
-			    opacity:descr.style.opacity
+			    opacity:descr.style.opacity,
+			    depthTest: false
 			}));
 
 			line.name = key;
-            
+			line.renderOrder = 2;
+
 			// originalIndex works as a link between the original
 			// data and THREE objects:
-		    
+
 			line.userData.originalIndex = li;
 			objectIds.push(line.id);
 			ispy.scene.getObjectByName(key).add(line);
