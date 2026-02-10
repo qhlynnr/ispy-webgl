@@ -79,10 +79,6 @@ This serves the `dist/` directory locally so you can verify the production build
 
 Can your browser use WebGL? Check [here](https://caniuse.com/#feat=webgl) or better yet click [here](https://get.webgl.org/).
 
-### How do I run this application locally?
-
-Clone this repository and in the `ispy-webgl/` directory run either `python -m http.server` (python3) or `python -m SimpleHTTPServer` (python2.7). Then go to `http://localhost:8000` in your browser.
-
 ### Does this run on a touch-screen like a tablet or phone?
 
 Yes, it should. You will not have access to certain click events though.
