@@ -675,16 +675,25 @@ ispy.importModel = function() {
     let files = document.getElementById('import-file').files;
     let extension, file_name;
     
-    if ( files.length === 1 ) { // If one file we assume it's an obj file and load it
-    
+    if ( files.length === 1 ) {
+
 	file_name = files[0].name;
 	extension = file_name.split('.').pop().toLowerCase();
-    
-	if ( extension !== 'obj' ) {
-      
-	    alert('The file you attempted to load: "'+ file_name +'" does not appear (at least from the extension) to be an .obj file!');
+
+	if ( extension === 'glb' || extension === 'gltf' ) {
+
+	    ispy.openDialog('#loading');
+	    ispy.closeDialog('#import-model');
+	    ispy.loadLocalGLTF(files[0]);
 	    return;
-	
+
+	}
+
+	if ( extension !== 'obj' ) {
+
+	    alert('The file you attempted to load: "'+ file_name +'" does not appear to be a supported format (.obj, .gltf, .glb)!');
+	    return;
+
 	}
 
 	ispy.openDialog('#loading');
@@ -746,13 +755,13 @@ ispy.loadSelectedGLTF = function() {
 
     let name = ispy.selected_gltf.split('.')[0];
     let gltf_file = './geometry/gltf/'+ispy.selected_gltf;
-    
+
     const gltf_loader = new GLTFLoader();
 
     gltf_loader.load(
 	gltf_file,
 	function(gltf) {
-	    
+
 	    let object = gltf.scene.children[0];
 
 	    object.children.forEach(function(c) {
@@ -764,9 +773,57 @@ ispy.loadSelectedGLTF = function() {
 
 	    ispy.scene.getObjectByName('Imported').add(object);
 	    ispy.addSelectionRow('Imported', name, name, [], true);
-	    
+
 	}
     );
+
+};
+
+ispy.loadLocalGLTF = function(file) {
+
+    const reader = new FileReader();
+    const name = file.name.split('.')[0];
+
+    reader.onload = function(e) {
+
+	const gltf_loader = new GLTFLoader();
+
+	gltf_loader.parse(e.target.result, '', function(gltf) {
+
+	    let object = gltf.scene;
+	    object.name = name;
+	    object.visible = true;
+	    ispy.disabled[name] = false;
+
+	    object.traverse(function(c) {
+
+		if (c.material) {
+		    c.material.clippingPlanes = ispy.local_planes;
+		    c.material.transparent = true;
+		    c.material.opacity = ispy.importTransparency;
+		    c.renderOrder = -1;
+		}
+
+	    });
+
+	    ispy.scene.getObjectByName('Imported').add(object);
+	    ispy.addSelectionRow('Imported', name, name, [], true);
+	    ispy.closeDialog('#loading');
+
+	}, function(error) {
+	    console.error('Error loading GLTF:', error);
+	    alert('Error loading GLTF file: ' + error.message);
+	    ispy.closeDialog('#loading');
+	});
+
+    };
+
+    reader.onerror = function(e) {
+	alert('Error reading file: ' + e);
+	ispy.closeDialog('#loading');
+    };
+
+    reader.readAsArrayBuffer(file);
 
 };
 
