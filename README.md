@@ -23,6 +23,43 @@ Contributors: [F. Ali](https://github.com/9inpachi), [L. Barnard](https://github
 
 <img src="https://github.com/cms-outreach/ispy-webgl/blob/master/graphics/ispy-webgl-screenshot-1.0.0.png"></img>
 
+## Install and run
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or later)
+
+### Clone and install
+
+```
+git clone https://github.com/cms-outreach/ispy-webgl.git
+cd ispy-webgl
+npm install
+```
+
+### Run (development)
+
+```
+npm run dev
+```
+
+This starts a local development server (powered by [Vite](https://vite.dev/)) with hot reloading at `http://localhost:5173/`.
+
+### Build for production
+
+```
+npm run build
+```
+
+This creates an optimized production build in the `dist/` directory.
+
+### Preview a production build
+
+```
+npm run preview
+```
+This serves the `dist/` directory locally so you can verify the production build before deploying.
+
 ## Papers and talks
 
 ["WebGL and three.js in CMS"](https://tpmccauley.github.io/cms-webgl-cwp/#/) at the HEP Software Foundation Visualization Workshop, March 2017.

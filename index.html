@@ -444,16 +444,10 @@ piwikTracker.enableLinkTracking();
 	<p>
 	  Supported formats: .glb, .gltf, .obj (with optional .mtl).
 	</p>
-        <p>
-          <i>Nota bene</i>: a large complicated 3D model may take minutes to load.
-        </p>
-        <p>
-          Files available via the web have been created from <a href="http://www.sketchup.com">SketchUp</a>
-          models created by <a href="https://twiki.cern.ch/twiki/bin/view/CMSPublic/SketchUpCMS">T. Sakuma.</a>
-        </p>
-        </p>
         <table>
-          <p><button type="button" class="btn btn-default" onclick="ispy.openDialog('#geometry-files'); ispy.loadObjFiles(); ispy.closeDialog('#import-model');">Open file(s) from the Web</button></p>
+          <p>
+	    <button type="button" class="btn btn-default" onclick="ispy.openDialog('#geometry-files'); ispy.loadObjFiles(); ispy.closeDialog('#import-model');">Open file(s) from the Web</button>
+	  </p>
           <p>
             Open local file(s): <input type="file" id="import-file" onchange="ispy.importModel();" accept=".glb,.gltf,.obj,.mtl" multiple/>
           </p>
