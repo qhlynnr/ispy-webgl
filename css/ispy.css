@@ -10,6 +10,10 @@ body.white {
   background-color: white;
 }
 
+a {
+  text-decoration: none;
+}
+
 canvas.hover {
   border:5px dashed #ccc;
 }
