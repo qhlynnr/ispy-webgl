@@ -1,3 +1,5 @@
+import ispy from './ispy-state.js';
+
 document.addEventListener('DOMContentLoaded', function() {
 
     ispy.init();

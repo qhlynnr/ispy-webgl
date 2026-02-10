@@ -10,6 +10,10 @@ body.white {
   background-color: white;
 }
 
+a {
+  text-decoration: none;
+}
+
 canvas.hover {
   border:5px dashed #ccc;
 }
@@ -172,8 +176,20 @@ canvas.hover {
   background-color: #dfdfdf;
 }
 
+.btn:hover {
+  background-color: #ccc !important;
+  color: #333 !important;
+}
+
+.btn:disabled,
+.btn.disabled {
+  background-color: #ccc !important;
+  color: #333 !important;
+}
+
 .btn.active {
-  background-color: #bbb;
+  background-color: #bbb !important;
+  color: #333 !important;
 }
 
 #treeview {
@@ -243,6 +259,7 @@ canvas.hover {
   height: 75vh;
   overflow: hidden;
   padding: 0;
+  position: relative;
 }
 
 #display.black {
@@ -270,10 +287,12 @@ canvas.hover {
 
 #tableview table thead th.black {
     background: black;
+    color: white;
 }
 
 #tableview table thead th.white {
     background: white;
+    color: black;
 }
 
 #tableview table thead th:first-child {
@@ -300,17 +319,39 @@ canvas.hover {
   background: black;
 }
 
+#tableview.black table {
+  --bs-table-bg: black;
+  --bs-table-color: white;
+  --bs-table-hover-bg: #777;
+  background-color: black;
+  color: white;
+}
+
 #tableview.white {
   color: black;
   background: white;
 }
 
-#tableview.black .table-hover tr:hover {
-  background-color: #777;
+#tableview.white table {
+  --bs-table-bg: white;
+  --bs-table-color: black;
+  --bs-table-hover-bg: #dfdfdf;
+  background-color: white;
+  color: black;
 }
 
-#tableview.white .table-hover tr:hover {
-  background-color: #dfdfdf;
+#tableview.black .table-hover tr:hover {
+  background-color: #777 !important;
+}
+
+tr.highlighted,
+tr.highlighted td {
+  background-color: #777 !important;
+}
+
+#tableview.white .table-hover tr:hover,
+#tableview.white tr.highlighted {
+  background-color: #dfdfdf !important;
 }
 
 #table-data-eventObject.black.table-hover>tbody>tr:hover {
@@ -330,10 +371,26 @@ canvas.hover {
   -moz-transform: translateY(-50%);
 }
 
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .modal-dialog button.close {
   color: red;
   text-shadow: none;
   opacity: 1.0;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1.25rem;
+  order: 2;
+  margin-left: auto;
+}
+
+.modal-header .modal-title {
+  order: 1;
 }
 
 .modal-content.black {

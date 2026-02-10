@@ -1,20 +1,21 @@
+import ispy from './ispy-state.js';
+import { Color, GLTFLoader, Line, Mesh, MTLLoader, OBJLoader } from './three-imports.js';
+import JSZip from 'jszip';
+import { Modal } from 'bootstrap';
+
 ispy.ig_data = null;
 ispy.ievent = 0;
 ispy.isGeometry = false;
 ispy.loaded_local = false;
 
 ispy.openDialog = function(id) {
-
-    //document.getElementById(id).style.display = 'block';
-    $(id).modal('show');
-
+    const el = document.querySelector(id);
+    Modal.getOrCreateInstance(el).show();
 };
 
 ispy.closeDialog = function(id) {
-
-    //document.getElementById(id).style.display = 'none';
-    $(id).modal('hide');
-
+    const el = document.querySelector(id);
+    Modal.getOrCreateInstance(el).hide();
 };
 
 ispy.hasFileAPI = function() {
@@ -104,16 +105,14 @@ ispy.enableNextPrev = function() {
 ispy.loadEvent = function() {
 
     document.getElementById('event-loaded').innerHTML = '';
-    //document.getElementById('loading').style.display = 'block';
-    
-    //$("#event-loaded").html("");
-    $("#loading").modal("show");
+    ispy.openDialog('#loading');
 
     ispy.selected_objects.clear();
 
     // Hide Detector stuff in tree view if already shown
-    if ( $('i.Detector').hasClass('glyphicon-chevron-down') ) {
-	
+    const detectorIcon = document.querySelector('i.Detector');
+    if ( detectorIcon && detectorIcon.classList.contains('glyphicon-chevron-down') ) {
+
 	ispy.toggleCollapse('Detector');
     }
     
@@ -129,12 +128,11 @@ ispy.loadEvent = function() {
     
     }
 
-    //document.getElementById('loading').style.display = 'none';
-    $("#loading").modal("hide");
+    ispy.closeDialog('#loading');
 
     if ( ispy.isGeometry ) {
 
-	$.extend(ispy.detector, event);
+	Object.assign(ispy.detector, event);
 	ispy.addDetector();
 	ispy.isGeometry = false;
 
@@ -188,16 +186,16 @@ ispy.selectLocalFile = function(index) {
 	var zip = new JSZip(data);
 	var event_list = [];
 
-	$.each(zip.files, function(index, zipEntry) {
+	Object.entries(zip.files).forEach(([index, zipEntry]) => {
 
 		if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
-		    
+
 		    if ( zipEntry.name.split('/')[0] === 'Geometry' ) {
-          
+
 			ispy.isGeometry = true;
-		    
+
 		    }
-        
+
 		    event_list.push(zipEntry.name);
 		}
 	    });
@@ -271,8 +269,7 @@ ispy.loadDroppedFile = function(file) {
     var reader = new FileReader();
     ispy.file_name = file.name;
 
-    //document.getElementById('loading').style.display = 'block';
-    $('#loading').modal('show');
+    ispy.openDialog('#loading');
 
     reader.onload = function(e) {
 
@@ -281,16 +278,16 @@ ispy.loadDroppedFile = function(file) {
 
 	var event_list = [];
 
-	$.each(zip.files, function(index, zipEntry) {
+	Object.entries(zip.files).forEach(([index, zipEntry]) => {
 
 	    if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
 
 		if ( zipEntry.name.split('/')[0] === 'Geometry' ) {
-			
+
 		    ispy.isGeometry = true;
-			
+
 		}
-		    
+
 		event_list.push(zipEntry.name);
 
 	    }
@@ -301,11 +298,10 @@ ispy.loadDroppedFile = function(file) {
 	ispy.event_index = 0;
 	ispy.updateEventList();
 	ispy.ig_data = zip;
-	
+
 	ispy.loadEvent();
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 
     };
 
@@ -326,27 +322,27 @@ ispy.selectFile = function(filename) {
     var new_file_name = filename.split('/')[2]; // of course this isn't a general case for files
     ispy.file_name = new_file_name;
 
-    //document.getElementById('progress').style.display = 'block';
-    $('#progress').modal('show');
-    
+    ispy.openDialog('#progress');
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", filename, true);
     xhr.overrideMimeType("text/plain; charset=x-user-defined");
-    
+
     ispy.clearTable("browser-events");
     var ecell = document.getElementById("browser-events").insertRow(0).insertCell(0);
     ecell.innerHTML = 'Loading events...';
 
     xhr.onprogress = function(evt) {
-    
+
 	if ( evt.lengthComputable ) {
-     
+
 	    var percentComplete = Math.round((evt.loaded / evt.total)*100);
-	    $('.progress-bar').attr('style', 'width:'+percentComplete+'%;');
-	    $('.progress-bar').html(percentComplete+'%');
-   
+	    const progressBar = document.querySelector('.progress-bar');
+	    progressBar.style.width = percentComplete + '%';
+	    progressBar.textContent = percentComplete + '%';
+
 	}
-    
+
     };
 
     xhr.onreadystatechange = function () {
@@ -363,29 +359,27 @@ ispy.selectFile = function(filename) {
 
 	    });
 
-	    $('#progress').modal('hide');
-	    //$('.progress-bar').attr('style', 'width:0%;');
-	    //$('.progress-bar').html('0%');
-    
+	    ispy.closeDialog('#progress');
+
 	}
-  
+
     };
 
     xhr.onload = function() {
-    
+
 	if ( this.status === 200 ) {
 
 	    var zip = JSZip(xhr.responseText);
 	    var event_list = [];
-	    
-	    $.each(zip.files, function(index, zipEntry) {
-		    
+
+	    Object.entries(zip.files).forEach(([index, zipEntry]) => {
+
 		if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
-          
+
 		    event_list.push(zipEntry.name);
-        
+
 		}
-      
+
 	    });
 
 	    ispy.event_list = event_list;
@@ -454,8 +448,7 @@ ispy.showWebFiles = function() {
   
     }
 
-    //document.getElementById('open-files').style.display = 'none';
-    $('#open-files').modal('hide');
+    ispy.closeDialog('#open-files');
 
 };
 
@@ -566,8 +559,7 @@ ispy.readOBJ = function(file, cb) {
 
     reader.onload = function(e) {
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 	cb(e.target.result, file.name);
 
     };
@@ -584,14 +576,15 @@ ispy.readOBJ = function(file, cb) {
 
 ispy.loadOBJ = function(contents, name) {
 
-    let object = new THREE.OBJLoader().parse(contents);
+    let object = new OBJLoader().parse(contents);
     object.name = name;
 
     object.children.forEach(function(c) {
-    
+
 	    c.material.transparency = true;
 	    c.material.opacity = ispy.importTransparency;
-  
+	    c.renderOrder = -1;
+
 	});
 
     ispy.scene.getObjectByName("Imported").add(object);
@@ -621,18 +614,18 @@ ispy.readOBJMTL = function(file, mtl_file, cb) {
 
 ispy.loadOBJMTL = function(obj, mtl_file, name) {
  
-    let object = new THREE.OBJLoader().parse(obj);
+    let object = new OBJLoader().parse(obj);
     let reader = new FileReader();
 
     reader.onload = function(e) {
 
 	let mtl = e.target.result;
-	let materials_creator = new THREE.MTLLoader().parse(e.target.result);
+	let materials_creator = new MTLLoader().parse(e.target.result);
 	materials_creator.preload();
 
 	object.traverse(function (o) {
 
-		if ( o instanceof THREE.Mesh || o instanceof THREE.Line ) {
+		if ( o instanceof Mesh || o instanceof Line ) {
        
 		    if ( o.material.name ) {
 
@@ -643,15 +636,15 @@ ispy.loadOBJMTL = function(obj, mtl_file, name) {
 			    o.material = material;
 			    o.material.transparent = true;
 			    o.material.opacity = ispy.importTransparency;
-			    
+			    o.renderOrder = -1;
+
 			}
 		    }
 		}
 
 	    });
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 
 	object.name = name;
 	object.visible = true;
@@ -659,7 +652,7 @@ ispy.loadOBJMTL = function(obj, mtl_file, name) {
 
 	ispy.scene.getObjectByName("Imported").add(object);
 	ispy.addSelectionRow("Imported", name, name, [], true);
-  
+
     };
 
     reader.readAsText(mtl_file);
@@ -682,23 +675,29 @@ ispy.importModel = function() {
     let files = document.getElementById('import-file').files;
     let extension, file_name;
     
-    if ( files.length === 1 ) { // If one file we assume it's an obj file and load it
-    
+    if ( files.length === 1 ) {
+
 	file_name = files[0].name;
 	extension = file_name.split('.').pop().toLowerCase();
-    
-	if ( extension !== 'obj' ) {
-      
-	    alert('The file you attempted to load: "'+ file_name +'" does not appear (at least from the extension) to be an .obj file!');
+
+	if ( extension === 'glb' || extension === 'gltf' ) {
+
+	    ispy.openDialog('#loading');
+	    ispy.closeDialog('#import-model');
+	    ispy.loadLocalGLTF(files[0]);
 	    return;
-	
+
 	}
 
-	//document.getElementById('loading').style.display = 'block';
-	//document.getElementById('import-model').style.display = 'none';
-	
-	$('#loading').modal('show');
-	$('#import-model').modal('hide');
+	if ( extension !== 'obj' ) {
+
+	    alert('The file you attempted to load: "'+ file_name +'" does not appear to be a supported format (.obj, .gltf, .glb)!');
+	    return;
+
+	}
+
+	ispy.openDialog('#loading');
+	ispy.closeDialog('#import-model');
 
 	ispy.readOBJ(files[0], ispy.loadOBJ);
 
@@ -726,11 +725,8 @@ ispy.importModel = function() {
 	
 	}
 	
-	//document.getElementById('loading').style.display = 'block';
-	//document.getElementById('import-model').style.display = 'none';
-	
-	$('#loading').modal('show');
-	$('#import-model').modal('hide');
+	ispy.openDialog('#loading');
+	ispy.closeDialog('#import-model');
 
 	ispy.readOBJMTL(obj_file, mtl_file, ispy.loadOBJMTL);
 	
@@ -759,26 +755,75 @@ ispy.loadSelectedGLTF = function() {
 
     let name = ispy.selected_gltf.split('.')[0];
     let gltf_file = './geometry/gltf/'+ispy.selected_gltf;
-    
-    const gltf_loader = new THREE.GLTFLoader();
+
+    const gltf_loader = new GLTFLoader();
 
     gltf_loader.load(
 	gltf_file,
 	function(gltf) {
-	    
+
 	    let object = gltf.scene.children[0];
 
 	    object.children.forEach(function(c) {
 
 		c.material.clippingPlanes = ispy.local_planes;
-			
+		c.renderOrder = -1;
+
 	    });
 
 	    ispy.scene.getObjectByName('Imported').add(object);
 	    ispy.addSelectionRow('Imported', name, name, [], true);
-	    
+
 	}
     );
+
+};
+
+ispy.loadLocalGLTF = function(file) {
+
+    const reader = new FileReader();
+    const name = file.name.split('.')[0];
+
+    reader.onload = function(e) {
+
+	const gltf_loader = new GLTFLoader();
+
+	gltf_loader.parse(e.target.result, '', function(gltf) {
+
+	    let object = gltf.scene;
+	    object.name = name;
+	    object.visible = true;
+	    ispy.disabled[name] = false;
+
+	    object.traverse(function(c) {
+
+		if (c.material) {
+		    c.material.clippingPlanes = ispy.local_planes;
+		    c.material.transparent = true;
+		    c.material.opacity = ispy.importTransparency;
+		    c.renderOrder = -1;
+		}
+
+	    });
+
+	    ispy.scene.getObjectByName('Imported').add(object);
+	    ispy.addSelectionRow('Imported', name, name, [], true);
+	    ispy.closeDialog('#loading');
+
+	}, function(error) {
+	    console.error('Error loading GLTF:', error);
+	    alert('Error loading GLTF file: ' + error.message);
+	    ispy.closeDialog('#loading');
+	});
+
+    };
+
+    reader.onerror = function(e) {
+	alert('Error reading file: ' + e);
+	ispy.closeDialog('#loading');
+    };
+
+    reader.readAsArrayBuffer(file);
 
 };
 
@@ -806,13 +851,13 @@ ispy.loadSelectedObj = function() {
 
 ispy.loadOBJMTL_new = function(obj_file, mtl_file, id, name, group, show) {
     
-    var mtl_loader = new THREE.MTLLoader();
+    var mtl_loader = new MTLLoader();
 
     mtl_loader.load(mtl_file, function(materials) {
 
 	materials.preload();
 
-	var obj_loader = new THREE.OBJLoader();
+	var obj_loader = new OBJLoader();
 	obj_loader.setMaterials(materials);
 
 	obj_loader.load(obj_file, function(object) {
@@ -822,11 +867,12 @@ ispy.loadOBJMTL_new = function(obj_file, mtl_file, id, name, group, show) {
 	    ispy.disabled[object.name] = false;
 	    
 	    object.children.forEach(function(c) {
-        
+
 		c.material.transparent = true;
 		c.material.opacity = ispy.importTransparency;
 		c.material.clippingPlanes = ispy.local_planes;
-      
+		c.renderOrder = -1;
+
 	    });
 
 	    ispy.scene.getObjectByName(group).add(object);
@@ -855,7 +901,7 @@ ispy.importBeampipe = function() {
 
 ispy.importDetector = function() {
 
-    const gltf_loader = new THREE.GLTFLoader();
+    const gltf_loader = new GLTFLoader();
     
     const gltf_objs = [
 	{
@@ -1085,8 +1131,7 @@ ispy.importDetector = function() {
 
     ];
 
-    //document.getElementById('loading').style.display = 'block';
-    $('#loading').modal('show');
+    ispy.openDialog('#loading');
 
     function loadGLTFs() {
 
@@ -1111,8 +1156,17 @@ ispy.importDetector = function() {
 			c.renderOrder = 1;
 
 			if ( c.material ) {
-			    
+
 			    c.material.clippingPlanes = ispy.local_planes;
+
+			    // Apply color from detector_description to filled meshes only
+			    // (preserve white color for line outlines)
+			    if (c instanceof Mesh) {
+				const desc = ispy.detector_description[g.view] && ispy.detector_description[g.view][g.id];
+				if (desc && desc.style && desc.style.color) {
+				    c.material.color = new Color(desc.style.color);
+				}
+			    }
 
 			}
 			
@@ -1133,11 +1187,10 @@ ispy.importDetector = function() {
 
 	});
 
-	//document.getElementById('loading').style.display = 'none';
-	$('#loading').modal('hide');
+	ispy.closeDialog('#loading');
 
     }
-    
+
     loadGLTFs();
     
 };

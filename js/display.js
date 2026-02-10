@@ -1,3 +1,6 @@
+import ispy from './ispy-state.js';
+import { Color, Vector2 } from './three-imports.js';
+
 ispy.invertColors = function() {
 
     ispy.inverted_colors = ! ispy.inverted_colors;
@@ -51,15 +54,13 @@ ispy.setTransparency = function(t) {
 
     let imported = ispy.scene.getObjectByName('Imported');
 
-    imported.children.forEach(function(obj) {
-    
-	obj.children.forEach(function(c) {
-      
+    imported.traverse(function(c) {
+
+	if (c.material) {
 	    c.material.transparent = true;
 	    c.material.opacity = t;
-    
-	});
-	    
+	}
+
     });
 
 };
@@ -95,38 +96,6 @@ ispy.updateRendererInfo = function() {
 
 };
 
-ispy.updateRenderer = function(type) {
-
-    if ( type === ispy.renderer_name ) {
-	
-	alert(type + ' is already in use');
-	return;
-  
-    }
-
-    if ( type === 'WebGLRenderer' ) {
-    
-	if ( ! ispy.hasWebGL() ) {
-      
-	    alert('WebGL is not available');
-    
-	}
-  
-    }
-
-    document.getElementById('display').removeChild(ispy.renderer.domElement);
-    document.getElementById('axes').removeChild(ispy.inset_renderer.domElement);
-
-    ispy.useRenderer(type);
-
-    var controls = new THREE.TrackballControls(ispy.camera, ispy.renderer.domElement);
-    controls.rotateSpeed = 3.0;
-    controls.zoomSpeed = 0.5;
-    ispy.controls = controls;
-    
-    ispy.updateRendererInfo();
-
-};
 
 ispy.onWindowResize = function() {
 
@@ -187,7 +156,7 @@ ispy.onMouseMove = function(e) {
     const offsetX = display.getBoundingClientRect().left + window.pageXOffset - left;
     const offsetY = display.getBoundingClientRect().top + window.pageYOffset - top;
 
-    const pointer = new THREE.Vector2();
+    const pointer = new Vector2();
     
     pointer.x = ((e.clientX-offsetX) / w)*2 - 1;
     pointer.y = -((e.clientY-offsetY) / h)*2 +1;
@@ -205,7 +174,7 @@ ispy.onMouseMove = function(e) {
 
 	if ( ! ispy.intersected.selected ) {
 	
-	    const original_color = new THREE.Color(
+	    const original_color = new Color(
 		ispy.event_description[ispy.current_view][ispy.intersected.name].style.color
 	    );
 
@@ -267,7 +236,7 @@ ispy.onMouseDown = function(e) {
 
 	    if ( ispy.intersected.selected ) {
 	    
-		const original_color = new THREE.Color(
+		const original_color = new Color(
 		    ispy.event_description[ispy.current_view][ispy.intersected.name].style.color
 		);
 		
@@ -370,7 +339,7 @@ document.addEventListener('keydown', function(e) {
 
 	if ( ispy.intersected && ispy.intersected.name.includes('Jet') ) {
 
-	    ispy.intersected.material.color = new THREE.Color(
+	    ispy.intersected.material.color = new Color(
 		ispy.event_description[ispy.current_view][ispy.intersected.name].style.color
 	    );
 
@@ -402,78 +371,127 @@ const mMuon2 = 0.10566*0.10566;
 const mElectron2 = 0.511e-3*0.511e-3;
 
 ispy.displayCollection = function(key, group, name, objectIds) {
- 
+
     ispy.currentCollection = key;
- 
+
     const type = ispy.current_event.Types[key];
     const collection = ispy.current_event.Collections[key];
 
-    const collectionTable = $('#collection-table');
-  
-    collectionTable.empty();
-    collectionTable.append('<caption>' + group + ': ' + name + '</caption>');
-    collectionTable.append('<thead> <tr>');
-    
-    const collectionTableHead = collectionTable.find('thead').find('tr');
-    
+    const collectionTable = document.getElementById('collection-table');
+
+    collectionTable.innerHTML = '';
+    collectionTable.insertAdjacentHTML('beforeend', '<caption>' + group + ': ' + name + '</caption>');
+    collectionTable.insertAdjacentHTML('beforeend', '<thead><tr></tr></thead><tbody></tbody>');
+
+    const collectionTableHead = collectionTable.querySelector('thead tr');
+    const collectionTableBody = collectionTable.querySelector('tbody');
+
     const color_class = ispy.inverted_colors ? 'group white' : 'group black';
 
-    collectionTableHead.append($('<th class="'+ color_class +'" data-sort="int"><i class="fa fa-sort"></i>index</th>'));
-    
+    collectionTableHead.insertAdjacentHTML('beforeend', '<th class="'+ color_class +'" data-sort="int"><i class="fa fa-sort"></i>index</th>');
+
     for ( let t in type ) {
 
 	let dataSort = type[t][1] === "double" ? "float" : type[t][1];
-	collectionTableHead.append($('<th class="'+ color_class +'" data-sort="' + dataSort + '"><i class="fa fa-sort"></i> ' + type[t][0] + '</th>'));
-  
+	collectionTableHead.insertAdjacentHTML('beforeend', '<th class="'+ color_class +'" data-sort="' + dataSort + '"><i class="fa fa-sort"></i> ' + type[t][0] + '</th>');
+
     }
 
     let index = 0;
-    
+
     for ( let c in collection ) {
-	
+
 	let row_content = "<tr id='" + key.concat(index++) + "' onmouseenter='ispy.highlightObject(\"" + objectIds[c] + "\")' onmouseout='ispy.unHighlightObject()'>";
 
 	let i = index-1;
 	row_content += "<td>"+ i + "</td>";
-	
+
 	for ( let v in collection[c] ) {
-  
+
 	    row_content += "<td>"+collection[c][v]+"</td>";
 
 	}
 
-	let rc = $(row_content);
-	collectionTable.append(rc);
-	
+	row_content += "</tr>";
+	collectionTableBody.insertAdjacentHTML('beforeend', row_content);
+
     }
 
-    collectionTable.stupidtable({
-	   
-	"v3d":function(a,b) {
+    // Vanilla JS table sorting (replacement for stupidtable)
+    ispy.initTableSort(collectionTable, collectionTableHead);
 
+};
+
+// Vanilla JS replacement for stupidtable plugin
+ispy.initTableSort = function(table, headerRow) {
+
+    const sortFns = {
+	"int": (a, b) => parseInt(a, 10) - parseInt(b, 10),
+	"float": (a, b) => parseFloat(a) - parseFloat(b),
+	"string": (a, b) => a.localeCompare(b),
+	"v3d": (a, b) => {
 	    const aV3 = a.split(",");
 	    const bV3 = b.split(",");
-
 	    if ( aV3.length === 3 && bV3.length === 3 ) {
-
 		const aLength = Math.sqrt(aV3[0] * aV3[0] + aV3[1] * aV3[1] + aV3[2] * aV3[2]);
 		const bLength = Math.sqrt(bV3[0] * bV3[0] + bV3[1] * bV3[1] + bV3[2] * bV3[2]);
-		
 		return aLength - bLength;
 	    }
-
 	    return 1;
-    
 	}
-    }).bind('aftertablesort', function(event, data){
-	
-	collectionTableHead.find('th').find('i').removeClass().addClass('fa fa-sort');
-	
-	const newClass = "fa fa-sort-" + data.direction;
-	collectionTableHead.find('th').eq(data.column).find('i').removeClass().addClass(newClass);
-	
+    };
+
+    const headers = headerRow.querySelectorAll('th[data-sort]');
+
+    headers.forEach((th, colIndex) => {
+
+	th.style.cursor = 'pointer';
+
+	th.addEventListener('click', () => {
+
+	    const sortType = th.dataset.sort;
+	    const sortFn = sortFns[sortType] || sortFns["string"];
+
+	    // Determine sort direction
+	    const currentDir = th.dataset.sortDir || 'asc';
+	    const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+	    th.dataset.sortDir = newDir;
+
+	    // Get tbody rows
+	    const tbody = table.querySelector('tbody');
+	    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+	    // Sort rows
+	    rows.sort((rowA, rowB) => {
+		const cellA = rowA.cells[colIndex]?.textContent || '';
+		const cellB = rowB.cells[colIndex]?.textContent || '';
+		return sortFn(cellA, cellB);
+	    });
+
+	    if ( newDir === 'desc' ) {
+		rows.reverse();
+	    }
+
+	    // Re-append sorted rows
+	    rows.forEach(row => tbody.appendChild(row));
+
+	    // Update sort icons
+	    headers.forEach(header => {
+		const icon = header.querySelector('i');
+		if ( icon ) {
+		    icon.className = 'fa fa-sort';
+		}
+	    });
+
+	    const thisIcon = th.querySelector('i');
+	    if ( thisIcon ) {
+		thisIcon.className = 'fa fa-sort-' + newDir;
+	    }
+
+	});
+
     });
-    
+
 };
 
 ispy.showMass = function() {
@@ -513,9 +531,8 @@ ispy.showMass = function() {
     m = Math.sqrt(m);
 
     document.getElementById('invariant-mass').innerHTML = m.toFixed(2);
-    //document.getElementById('invariant-mass-modal').style.display = 'block';
-    $('#invariant-mass-modal').modal('show');
-    
+    ispy.openDialog('#invariant-mass-modal');
+
     ispy.selected_objects.clear();
 
 };
@@ -590,28 +607,26 @@ ispy.displayEventObjectData = function() {
 };
 
 ispy.highlightTableRow = function(key, objectUserData, doEffect) {
- 
+
     if ( ( ispy.currentCollection == key && doEffect ) || ! doEffect ) {
-	
-	var selector = "#" + key.concat(objectUserData.originalIndex);
-	var row = $(selector);
+
+	const selector = "#" + key.concat(objectUserData.originalIndex);
+	const row = document.querySelector(selector);
 
 	if ( row ) {
-	    
+
 	    if ( doEffect ) {
-		
-		var color = ispy.inverted_colors ? "#dfdfdf" : "#777";
-		row.css("background-color", color);
-		//row.scrollintoview();
+
+		row.classList.add('highlighted');
 
 	    } else {
-		
-		row.removeAttr("style");
-	    
+
+		row.classList.remove('highlighted');
+
 	    }
-    
+
 	}
-  
+
     }
 
 };

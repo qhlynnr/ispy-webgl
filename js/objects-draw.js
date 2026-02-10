@@ -1,3 +1,18 @@
+import ispy from './ispy-state.js';
+import {
+    ArrowHelper, BufferAttribute, BufferGeometry, Color, CubicBezierCurve3,
+    CylinderGeometry, DoubleSide, EdgesGeometry, Line, Line2, LineBasicMaterial,
+    LineDashedMaterial, LineGeometry, LineMaterial, LineSegments, Matrix4, Mesh,
+    MeshBasicMaterial, Object3D, RingGeometry, SphereGeometry, Vector2, Vector3
+} from './three-imports.js';
+
+// Helper to create LineMaterial with resolution set (required for Line2 in Three.js r150+)
+function createLineMaterial(params) {
+    const material = new LineMaterial(params);
+    material.resolution.set(window.innerWidth, window.innerHeight);
+    return material;
+}
+
 ispy.makeWireframeBox = function(data, ci) {
 
     let all_positions = [];
@@ -30,12 +45,12 @@ ispy.makeWireframeBox = function(data, ci) {
     addFace3(data[ci + 1], data[ci + 5], data[ci + 6]);
     addFace3(data[ci + 6], data[ci + 2], data[ci + 1]);
 
-    const box_buffer = new THREE.BufferGeometry();
-    box_buffer.attributes.position = new THREE.BufferAttribute(
+    const box_buffer = new BufferGeometry();
+    box_buffer.attributes.position = new BufferAttribute(
         new Float32Array(all_positions), 3
     );
 
-    const box = new THREE.EdgesGeometry(box_buffer);
+    const box = new EdgesGeometry(box_buffer);
 
     return box;
 
@@ -52,12 +67,12 @@ ispy.makeWireFace = function(data, ci) {
     addFace3(data[ci], data[ci + 1], data[ci + 2]);
     addFace3(data[ci + 2], data[ci + 3], data[ci]);
 
-    const box_buffer = new THREE.BufferGeometry();
-    box_buffer.attributes.position = new THREE.BufferAttribute(
+    const box_buffer = new BufferGeometry();
+    box_buffer.attributes.position = new BufferAttribute(
         new Float32Array(all_positions), 3
     );
 
-    const box = new THREE.EdgesGeometry(box_buffer);
+    const box = new EdgesGeometry(box_buffer);
     
     return box;
 
@@ -74,8 +89,8 @@ ispy.makeSolidFace = function(data, ci) {
     addFace3(data[ci], data[ci + 1], data[ci + 2]);
     addFace3(data[ci + 2], data[ci + 3], data[ci]);
 
-    const box_buffer = new THREE.BufferGeometry();
-    box_buffer.attributes.position = new THREE.BufferAttribute(
+    const box_buffer = new BufferGeometry();
+    box_buffer.attributes.position = new BufferAttribute(
         new Float32Array(all_positions), 3
     );
     
@@ -115,12 +130,12 @@ ispy.makeSolidBox = function(data, ci) {
     addFace3(data[ci + 1], data[ci + 5], data[ci + 6]);
     addFace3(data[ci + 6], data[ci + 2], data[ci + 1]);
 
-    const box_buffer = new THREE.BufferGeometry();
-    box_buffer.attributes.position = new THREE.BufferAttribute(
+    const box_buffer = new BufferGeometry();
+    box_buffer.attributes.position = new BufferAttribute(
         new Float32Array(all_positions), 3
     );
     
-    const box_edges = new THREE.EdgesGeometry(box_buffer);
+    const box_edges = new EdgesGeometry(box_buffer);
 
     return [box_buffer, box_edges];
 
@@ -180,12 +195,12 @@ ispy.makeSolidBoxRZ = function(data, ci) {
     addFace3(v1, v5, v6);
     addFace3(v6, v2, v1);
 
-    const box_buffer = new THREE.BufferGeometry();
-    box_buffer.attributes.position = new THREE.BufferAttribute(
+    const box_buffer = new BufferGeometry();
+    box_buffer.attributes.position = new BufferAttribute(
         new Float32Array(all_positions), 3
     );
     
-    const box_edges = new THREE.EdgesGeometry(box_buffer);
+    const box_edges = new EdgesGeometry(box_buffer);
 
     return [box_buffer, box_edges];
 
@@ -199,19 +214,19 @@ ispy.makeScaledSolidBox = function(data, boxes, ci, energy, scale) {
 	all_positions = all_positions.concat(...vectors);
     };
     
-    let v0 = new THREE.Vector3(...data[ci]);
-    let v1 = new THREE.Vector3(...data[ci+1]);
-    let v2 = new THREE.Vector3(...data[ci+2]);
-    let v3 = new THREE.Vector3(...data[ci+3]);
+    let v0 = new Vector3(...data[ci]);
+    let v1 = new Vector3(...data[ci+1]);
+    let v2 = new Vector3(...data[ci+2]);
+    let v3 = new Vector3(...data[ci+3]);
     
-    let v4 = new THREE.Vector3(...data[ci+4]);
-    let v5 = new THREE.Vector3(...data[ci+5]);
-    let v6 = new THREE.Vector3(...data[ci+6]);
-    let v7 = new THREE.Vector3(...data[ci+7]);
+    let v4 = new Vector3(...data[ci+4]);
+    let v5 = new Vector3(...data[ci+5]);
+    let v6 = new Vector3(...data[ci+6]);
+    let v7 = new Vector3(...data[ci+7]);
  
     scale = energy/scale;
 
-    const center = new THREE.Vector3();
+    const center = new Vector3();
 
     center.addVectors(v0,v1);
     center.add(v2).add(v3)
@@ -270,8 +285,8 @@ ispy.makeScaledSolidBox = function(data, boxes, ci, energy, scale) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const box = new THREE.BufferGeometry();
-    box.attributes.position = new THREE.BufferAttribute(
+    const box = new BufferGeometry();
+    box.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions), 3
     );
 
@@ -288,16 +303,16 @@ ispy.makeScaledSolidBoxRZ = function(data, boxes, ci, energy, scale) {
     };
     
     // Front vertices
-    let f1 = new THREE.Vector3(...data[ci]);
-    let f2 = new THREE.Vector3(...data[ci+1]);
-    let f3 = new THREE.Vector3(...data[ci+2]);
-    let f4 = new THREE.Vector3(...data[ci+3]);
+    let f1 = new Vector3(...data[ci]);
+    let f2 = new Vector3(...data[ci+1]);
+    let f3 = new Vector3(...data[ci+2]);
+    let f4 = new Vector3(...data[ci+3]);
     
     // Back vertices    
-    let b1 = new THREE.Vector3(...data[ci+4]);
-    let b2 = new THREE.Vector3(...data[ci+5]);
-    let b3 = new THREE.Vector3(...data[ci+6]);
-    let b4 = new THREE.Vector3(...data[ci+7]);
+    let b1 = new Vector3(...data[ci+4]);
+    let b2 = new Vector3(...data[ci+5]);
+    let b3 = new Vector3(...data[ci+6]);
+    let b4 = new Vector3(...data[ci+7]);
 
     let yf1 = Math.sqrt(f1.x*f1.x + f1.y*f1.y);
     let yf2 = Math.sqrt(f2.x*f2.x + f2.y*f2.y);
@@ -324,19 +339,19 @@ ispy.makeScaledSolidBoxRZ = function(data, boxes, ci, energy, scale) {
         x = -x;
     }
 
-    let v0 = new THREE.Vector3(x, yf1, f1.z);
-    let v1 = new THREE.Vector3(2*x, yf2, f2.z);
-    let v2 = new THREE.Vector3(2*x, yf3, f3.z);
-    let v3 = new THREE.Vector3(x, yf4, f4.z);
+    let v0 = new Vector3(x, yf1, f1.z);
+    let v1 = new Vector3(2*x, yf2, f2.z);
+    let v2 = new Vector3(2*x, yf3, f3.z);
+    let v3 = new Vector3(x, yf4, f4.z);
 
-    let v4 = new THREE.Vector3(x, yb1, b1.z);
-    let v5 = new THREE.Vector3(2*x, yb2, b2.z);
-    let v6 = new THREE.Vector3(2*x, yb3, b3.z);
-    let v7 = new THREE.Vector3(x, yb4, b4.z);
+    let v4 = new Vector3(x, yb1, b1.z);
+    let v5 = new Vector3(2*x, yb2, b2.z);
+    let v6 = new Vector3(2*x, yb3, b3.z);
+    let v7 = new Vector3(x, yb4, b4.z);
  
     scale = energy/scale;
 
-    const center = new THREE.Vector3();
+    const center = new Vector3();
 
     center.addVectors(v0,v1);
     center.add(v2).add(v3)
@@ -395,8 +410,8 @@ ispy.makeScaledSolidBoxRZ = function(data, boxes, ci, energy, scale) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const box = new THREE.BufferGeometry();
-    box.attributes.position = new THREE.BufferAttribute(
+    const box = new BufferGeometry();
+    box.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions), 3
     );
 
@@ -413,16 +428,16 @@ ispy.makeScaledSolidTower = function(data, towers, ci, energy, scale) {
     };
 
     // Front vertices
-    let v0 = new THREE.Vector3(...data[ci]);
-    let v1 = new THREE.Vector3(...data[ci+1]);
-    let v2 = new THREE.Vector3(...data[ci+2]);
-    let v3 = new THREE.Vector3(...data[ci+3]);
+    let v0 = new Vector3(...data[ci]);
+    let v1 = new Vector3(...data[ci+1]);
+    let v2 = new Vector3(...data[ci+2]);
+    let v3 = new Vector3(...data[ci+3]);
     
     // Back vertices    
-    let v4 = new THREE.Vector3(...data[ci+4]);
-    let v5 = new THREE.Vector3(...data[ci+5]);
-    let v6 = new THREE.Vector3(...data[ci+6]);
-    let v7 = new THREE.Vector3(...data[ci+7]);
+    let v4 = new Vector3(...data[ci+4]);
+    let v5 = new Vector3(...data[ci+5]);
+    let v6 = new Vector3(...data[ci+6]);
+    let v7 = new Vector3(...data[ci+7]);
 
     scale = energy/scale;
 
@@ -465,8 +480,8 @@ ispy.makeScaledSolidTower = function(data, towers, ci, energy, scale) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const tower = new THREE.BufferGeometry();
-    tower.attributes.position = new THREE.BufferAttribute(
+    const tower = new BufferGeometry();
+    tower.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions), 3
     );
 
@@ -483,16 +498,16 @@ ispy.makePFCandidateTowersRZ = function(data, towers, ci, energy, scale) {
     };
     
     // Front vertices
-    let f1 = new THREE.Vector3(...data[ci]);
-    let f2 = new THREE.Vector3(...data[ci+1]);
-    let f3 = new THREE.Vector3(...data[ci+2]);
-    let f4 = new THREE.Vector3(...data[ci+3]);
+    let f1 = new Vector3(...data[ci]);
+    let f2 = new Vector3(...data[ci+1]);
+    let f3 = new Vector3(...data[ci+2]);
+    let f4 = new Vector3(...data[ci+3]);
     
     // Back vertices    
-    let b1 = new THREE.Vector3(...data[ci+4]);
-    let b2 = new THREE.Vector3(...data[ci+5]);
-    let b3 = new THREE.Vector3(...data[ci+6]);
-    let b4 = new THREE.Vector3(...data[ci+7]);
+    let b1 = new Vector3(...data[ci+4]);
+    let b2 = new Vector3(...data[ci+5]);
+    let b3 = new Vector3(...data[ci+6]);
+    let b4 = new Vector3(...data[ci+7]);
 
     let yf1 = Math.sqrt(f1.x*f1.x + f1.y*f1.y);
     let yf2 = Math.sqrt(f2.x*f2.x + f2.y*f2.y);
@@ -523,15 +538,15 @@ ispy.makePFCandidateTowersRZ = function(data, towers, ci, energy, scale) {
     if ( f2.z > 0. )
 	x = -x;
 
-    let v0 = new THREE.Vector3(layer + x, yf1, f1.z);
-    let v1 = new THREE.Vector3(layer + 2*x, yf2, f2.z);
-    let v2 = new THREE.Vector3(layer + 2*x, yf3, f3.z);
-    let v3 = new THREE.Vector3(layer + x, yf4, f4.z);
+    let v0 = new Vector3(layer + x, yf1, f1.z);
+    let v1 = new Vector3(layer + 2*x, yf2, f2.z);
+    let v2 = new Vector3(layer + 2*x, yf3, f3.z);
+    let v3 = new Vector3(layer + x, yf4, f4.z);
 
-    let v4 = new THREE.Vector3(layer + x, yb1, b1.z);
-    let v5 = new THREE.Vector3(layer + 2*x, yb2, b2.z);
-    let v6 = new THREE.Vector3(layer + 2*x, yb3, b3.z);
-    let v7 = new THREE.Vector3(layer + x, yb4, b4.z);
+    let v4 = new Vector3(layer + x, yb1, b1.z);
+    let v5 = new Vector3(layer + 2*x, yb2, b2.z);
+    let v6 = new Vector3(layer + 2*x, yb3, b3.z);
+    let v7 = new Vector3(layer + x, yb4, b4.z);
     
     scale = energy/scale;
 
@@ -574,8 +589,8 @@ ispy.makePFCandidateTowersRZ = function(data, towers, ci, energy, scale) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const tower = new THREE.BufferGeometry();
-    tower.attributes.position = new THREE.BufferAttribute(
+    const tower = new BufferGeometry();
+    tower.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions), 3
     );
 
@@ -592,16 +607,16 @@ ispy.makePFCandidateTowers = function(data, towers, ci, energy, scale) {
     };
     
     // Front vertices
-    let v0 = new THREE.Vector3(...data[ci]);
-    let v1 = new THREE.Vector3(...data[ci+1]);
-    let v2 = new THREE.Vector3(...data[ci+2]);
-    let v3 = new THREE.Vector3(...data[ci+3]);
+    let v0 = new Vector3(...data[ci]);
+    let v1 = new Vector3(...data[ci+1]);
+    let v2 = new Vector3(...data[ci+2]);
+    let v3 = new Vector3(...data[ci+3]);
     
     // Back vertices    
-    let v4 = new THREE.Vector3(...data[ci+4]);
-    let v5 = new THREE.Vector3(...data[ci+5]);
-    let v6 = new THREE.Vector3(...data[ci+6]);
-    let v7 = new THREE.Vector3(...data[ci+7]);
+    let v4 = new Vector3(...data[ci+4]);
+    let v5 = new Vector3(...data[ci+5]);
+    let v6 = new Vector3(...data[ci+6]);
+    let v7 = new Vector3(...data[ci+7]);
 
     scale = energy/scale;
 
@@ -644,8 +659,8 @@ ispy.makePFCandidateTowers = function(data, towers, ci, energy, scale) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const tower = new THREE.BufferGeometry();
-    tower.attributes.position = new THREE.BufferAttribute(
+    const tower = new BufferGeometry();
+    tower.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions), 3
     );
 
@@ -713,16 +728,16 @@ ispy.makeScaledSolidTowerRZ = function(data, towers, ci, energy, scale) {
     };
 
     // Front vertices
-    let f1 = new THREE.Vector3(...data[ci]);
-    let f2 = new THREE.Vector3(...data[ci+1]);
-    let f3 = new THREE.Vector3(...data[ci+2]);
-    let f4 = new THREE.Vector3(...data[ci+3]);
+    let f1 = new Vector3(...data[ci]);
+    let f2 = new Vector3(...data[ci+1]);
+    let f3 = new Vector3(...data[ci+2]);
+    let f4 = new Vector3(...data[ci+3]);
     
     // Back vertices    
-    let b1 = new THREE.Vector3(...data[ci+4]);
-    let b2 = new THREE.Vector3(...data[ci+5]);
-    let b3 = new THREE.Vector3(...data[ci+6]);
-    let b4 = new THREE.Vector3(...data[ci+7]);
+    let b1 = new Vector3(...data[ci+4]);
+    let b2 = new Vector3(...data[ci+5]);
+    let b3 = new Vector3(...data[ci+6]);
+    let b4 = new Vector3(...data[ci+7]);
     
     let yf1 = Math.sqrt(f1.x*f1.x + f1.y*f1.y);
     let yf2 = Math.sqrt(f2.x*f2.x + f2.y*f2.y);
@@ -753,15 +768,15 @@ ispy.makeScaledSolidTowerRZ = function(data, towers, ci, energy, scale) {
     if ( f2.z > 0. )
 	x = -x;
 
-    let v0 = new THREE.Vector3(layer + x, yf1, f1.z);
-    let v1 = new THREE.Vector3(layer + 2*x, yf2, f2.z);
-    let v2 = new THREE.Vector3(layer + 2*x, yf3, f3.z);
-    let v3 = new THREE.Vector3(layer + x, yf4, f4.z);
+    let v0 = new Vector3(layer + x, yf1, f1.z);
+    let v1 = new Vector3(layer + 2*x, yf2, f2.z);
+    let v2 = new Vector3(layer + 2*x, yf3, f3.z);
+    let v3 = new Vector3(layer + x, yf4, f4.z);
 
-    let v4 = new THREE.Vector3(layer + x, yb1, b1.z);
-    let v5 = new THREE.Vector3(layer + 2*x, yb2, b2.z);
-    let v6 = new THREE.Vector3(layer + 2*x, yb3, b3.z);
-    let v7 = new THREE.Vector3(layer + x, yb4, b4.z);
+    let v4 = new Vector3(layer + x, yb1, b1.z);
+    let v5 = new Vector3(layer + 2*x, yb2, b2.z);
+    let v6 = new Vector3(layer + 2*x, yb3, b3.z);
+    let v7 = new Vector3(layer + x, yb4, b4.z);
     
     scale = energy/scale;
 
@@ -804,8 +819,8 @@ ispy.makeScaledSolidTowerRZ = function(data, towers, ci, energy, scale) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const tower = new THREE.BufferGeometry();
-    tower.attributes.position = new THREE.BufferAttribute(
+    const tower = new BufferGeometry();
+    tower.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions), 3
     );
 
@@ -819,18 +834,18 @@ ispy.makeTrackerPiece = function(data) {
     
 };
 
-projectVector = function(v, s) {
+const projectVector = function(v, s) {
 
     const size = Math.sqrt(v.x*v.x + v.y*v.y);
 
     if ( s.y < 0.0 )
-    	return new THREE.Vector3(0, -size, v.z);
+    	return new Vector3(0, -size, v.z);
     
-    return new THREE.Vector3(0, size, v.z);
+    return new Vector3(0, size, v.z);
 
 };
 
-projectPoint = function(v, s) {
+const projectPoint = function(v, s) {
     
     const size = Math.sqrt(v[0]*v[0] + v[1]*v[1]);
 
@@ -850,7 +865,7 @@ ispy.makeTrackPointsRZ = function(data, extra, assoc, style, selection) {
     }
     
     let cut = [];
-    let mi = 0;  
+    let mi = 0, pi = 0;
     let positions = [];
     let lps = [];
     let ap, ai;
@@ -878,7 +893,7 @@ ispy.makeTrackPointsRZ = function(data, extra, assoc, style, selection) {
 	    
 	} else {
 
-	    lps.push(new THREE.Vector3(...extra[ap[1][1]][0]));
+	    lps.push(new Vector3(...extra[ap[1][1]][0]));
 	    
 	}
 	
@@ -891,17 +906,17 @@ ispy.makeTrackPointsRZ = function(data, extra, assoc, style, selection) {
 	
 	if ( ispy.use_line2 ) {
 
-	    positions[mi].push(projectPoint(...extra[pi][0], lps[mi]));
+	    positions[mi].push(...projectPoint(extra[pi][0], lps[mi]));
 
 	} else {
 	    
-	    positions[mi].push(projectVector(new THREE.Vector3(...extra[pi][0]), lps[mi]));
+	    positions[mi].push(projectVector(new Vector3(...extra[pi][0]), lps[mi]));
 
 	}
 	
     }
     
-    let tcolor = new THREE.Color(style.color);
+    let tcolor = new Color(style.color);
     let transp = true;
   
     let lines = [];
@@ -910,11 +925,11 @@ ispy.makeTrackPointsRZ = function(data, extra, assoc, style, selection) {
 
 	if ( ispy.use_line2 ) {
 	
-	    const line2 = new THREE.Line2(
-		new THREE.LineGeometry().setPositions(positions[k]),
-		new THREE.LineMaterial({
+	    const line2 = new Line2(
+		new LineGeometry().setPositions(positions[k]),
+		createLineMaterial({
 		    color: tcolor,
-		    linewidth: style.linewidth*0.001,
+		    linewidth: style.linewidth,
 		    transparent: transp,
 		    opacity:style.opacity
 		})
@@ -927,9 +942,9 @@ ispy.makeTrackPointsRZ = function(data, extra, assoc, style, selection) {
 
 	} else {
 
-	    const line = new THREE.Line(
-		new THREE.BufferGeometry().setFromPoints(positions[k]),
-		new THREE.LineBasicMaterial({
+	    const line = new Line(
+		new BufferGeometry().setFromPoints(positions[k]),
+		new LineBasicMaterial({
 		    color: tcolor,
 		    transparent: transp,
 		    opacity: style.opacity
@@ -957,9 +972,9 @@ ispy.makeTrackPoints = function(data, extra, assoc, style, selection) {
     }
     
     let cut = [];
-    let mi = 0;  
+    let mi = 0, pi = 0;
     let positions = [];
-    
+
     for ( let i = 0; i < data.length; i++ ) {
 
 	positions[i] = [];
@@ -977,13 +992,13 @@ ispy.makeTrackPoints = function(data, extra, assoc, style, selection) {
 
 	} else {
 	    
-	    positions[mi].push(new THREE.Vector3(...extra[pi][0]));
+	    positions[mi].push(new Vector3(...extra[pi][0]));
 
 	}
 	
     }
     
-    let tcolor = new THREE.Color(style.color);
+    let tcolor = new Color(style.color);
     let transp = true;
   
     let lines = [];
@@ -992,11 +1007,11 @@ ispy.makeTrackPoints = function(data, extra, assoc, style, selection) {
 
 	if ( ispy.use_line2 ) {
 	
-	    const line2 = new THREE.Line2(
-		new THREE.LineGeometry().setPositions(positions[k]),
-		new THREE.LineMaterial({
+	    const line2 = new Line2(
+		new LineGeometry().setPositions(positions[k]),
+		createLineMaterial({
 		    color: tcolor,
-		    linewidth: style.linewidth*0.001,
+		    linewidth: style.linewidth,
 		    transparent: transp,
 		    opacity:style.opacity
 		})
@@ -1009,9 +1024,9 @@ ispy.makeTrackPoints = function(data, extra, assoc, style, selection) {
 
 	} else {
 
-	    const line = new THREE.Line(
-		new THREE.BufferGeometry().setFromPoints(positions[k]),
-		new THREE.LineBasicMaterial({
+	    const line = new Line(
+		new BufferGeometry().setFromPoints(positions[k]),
+		new LineBasicMaterial({
 		    color: tcolor,
 		    transparent: transp,
 		    opacity: style.opacity
@@ -1039,11 +1054,11 @@ ispy.makeTracks = function(tracks, extras, assocs, style, selection) {
     }
 
     let ti, ei;
-    let p1, d1, p2, d2;
+    let p1, d1, p2, d2, p3, p4;
     let distance, scale, curve;
     let curves = [];
 
-    let tcolor = new THREE.Color();    
+    let tcolor = new Color();    
     tcolor.setStyle(style.color);
 
     const transp = true;
@@ -1057,12 +1072,12 @@ ispy.makeTracks = function(tracks, extras, assocs, style, selection) {
 	ti = assocs[i][0][1];
 	ei = assocs[i][1][1];
 	
-	p1 = new THREE.Vector3(...extras[ei][0]);
-	d1 = new THREE.Vector3(...extras[ei][1]);
+	p1 = new Vector3(...extras[ei][0]);
+	d1 = new Vector3(...extras[ei][1]);
 	d1.normalize();
 	
-	p2 = new THREE.Vector3(...extras[ei][2]);
-	d2 = new THREE.Vector3(...extras[ei][3]);
+	p2 = new Vector3(...extras[ei][2]);
+	d2 = new Vector3(...extras[ei][3]);
 	d2.normalize();
 	
 	// What's all this then?
@@ -1078,13 +1093,13 @@ ispy.makeTracks = function(tracks, extras, assocs, style, selection) {
 	distance = p1.distanceTo(p2);
 	scale = distance*0.25;
 	
-	p3 = new THREE.Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
-	p4 = new THREE.Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
+	p3 = new Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
+	p4 = new Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
 	
-	curve = new THREE.CubicBezierCurve3(p1,p3,p4,p2);
-	    let line = new THREE.Line(
-		new THREE.BufferGeometry().setFromPoints(curve.getPoints(32)),
-		new THREE.LineBasicMaterial({
+	curve = new CubicBezierCurve3(p1,p3,p4,p2);
+	    let line = new Line(
+		new BufferGeometry().setFromPoints(curve.getPoints(32)),
+		new LineBasicMaterial({
 		    color:tcolor,
 		    opacity:style.opacity,
 		    transparent: transp,
@@ -1110,11 +1125,11 @@ ispy.makeTracksRZ = function(tracks, extras, assocs, style, selection) {
     }
 
     let ti, ei;
-    let p1, d1, p2, d2;
+    let p1, d1, p2, d2, p3, p4;
     let distance, scale, curve;
     let curves = [];
 
-    let tcolor = new THREE.Color();    
+    let tcolor = new Color();    
     tcolor.setStyle(style.color);
 
     const transp = true;
@@ -1128,14 +1143,14 @@ ispy.makeTracksRZ = function(tracks, extras, assocs, style, selection) {
 	ti = assocs[i][0][1];
 	ei = assocs[i][1][1];
 
-	p2 = new THREE.Vector3(...extras[ei][2]);
+	p2 = new Vector3(...extras[ei][2]);
 	
-	p1 = projectVector(new THREE.Vector3(...extras[ei][0]), p2);
-	d1 = projectVector(new THREE.Vector3(...extras[ei][1]), p2);
+	p1 = projectVector(new Vector3(...extras[ei][0]), p2);
+	d1 = projectVector(new Vector3(...extras[ei][1]), p2);
 	d1.normalize();
 	
 	p2 = projectVector(p2, p2);
-	d2 = projectVector(new THREE.Vector3(...extras[ei][3]), p2);
+	d2 = projectVector(new Vector3(...extras[ei][3]), p2);
 	d2.normalize();
 	
 	// What's all this then?
@@ -1151,13 +1166,13 @@ ispy.makeTracksRZ = function(tracks, extras, assocs, style, selection) {
 	distance = p1.distanceTo(p2);
 	scale = distance*0.25;
 	
-	p3 = new THREE.Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
-	p4 = new THREE.Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
+	p3 = new Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
+	p4 = new Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
 
-	curve = new THREE.CubicBezierCurve3(p1,p3,p4,p2);
-	    let line = new THREE.Line(
-		new THREE.BufferGeometry().setFromPoints(curve.getPoints(32)),
-		new THREE.LineBasicMaterial({
+	curve = new CubicBezierCurve3(p1,p3,p4,p2);
+	    let line = new Line(
+		new BufferGeometry().setFromPoints(curve.getPoints(32)),
+		new LineBasicMaterial({
 		    color:tcolor,
 		    opacity:style.opacity,
 		    transparent: transp,
@@ -1183,11 +1198,11 @@ ispy.makeThickTracks = function(tracks, extras, assocs, style, selection) {
     }
 
     let ti, ei;
-    let p1, d1, p2, d2;
+    let p1, d1, p2, d2, p3, p4;
     let distance, scale, curve;
     let curves = [];
 
-    let tcolor = new THREE.Color();    
+    let tcolor = new Color();    
     tcolor.setStyle(style.color);
 
     const transp = true;
@@ -1201,12 +1216,12 @@ ispy.makeThickTracks = function(tracks, extras, assocs, style, selection) {
 	ti = assocs[i][0][1];
 	ei = assocs[i][1][1];
 	
-	p1 = new THREE.Vector3(...extras[ei][0]);
-	d1 = new THREE.Vector3(...extras[ei][1]);
+	p1 = new Vector3(...extras[ei][0]);
+	d1 = new Vector3(...extras[ei][1]);
 	d1.normalize();
 	
-	p2 = new THREE.Vector3(...extras[ei][2]);
-	d2 = new THREE.Vector3(...extras[ei][3]);
+	p2 = new Vector3(...extras[ei][2]);
+	d2 = new Vector3(...extras[ei][3]);
 	d2.normalize();
 	
 	// What's all this then?
@@ -1222,23 +1237,23 @@ ispy.makeThickTracks = function(tracks, extras, assocs, style, selection) {
 	distance = p1.distanceTo(p2);
 	scale = distance*0.25;
 	
-	p3 = new THREE.Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
-	p4 = new THREE.Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
+	p3 = new Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
+	p4 = new Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
 	
-	curve = new THREE.CubicBezierCurve3(p1,p3,p4,p2);
+	curve = new CubicBezierCurve3(p1,p3,p4,p2);
 
 	if ( ispy.use_line2 ) {
 
-	    let lg = new THREE.LineGeometry();
+	    let lg = new LineGeometry();
 	    let positions = [];
 	    curve.getPoints(32).forEach(function(p) { positions.push(p.x,p.y,p.z); });
 	    lg.setPositions(positions);
 
-	    let line = new THREE.Line2(lg, new THREE.LineMaterial({
+	    let line = new Line2(lg, createLineMaterial({
 		color:tcolor,
 		opacity:style.opacity,
 		transparent:transp,
-		linewidth:style.linewidth*0.001
+		linewidth:style.linewidth
 	    }));
 
 	    line.computeLineDistances();
@@ -1249,9 +1264,9 @@ ispy.makeThickTracks = function(tracks, extras, assocs, style, selection) {
 
 	} else {
 
-	    let line = new THREE.Line(
-		new THREE.BufferGeometry().setFromPoints(curve.getPoints(32)),
-		new THREE.LineBasicMaterial({
+	    let line = new Line(
+		new BufferGeometry().setFromPoints(curve.getPoints(32)),
+		new LineBasicMaterial({
 		    color:tcolor,
 		    opacity:style.opacity,
 		    transparent: transp,
@@ -1279,11 +1294,11 @@ ispy.makeThickTracksRZ = function(tracks, extras, assocs, style, selection) {
     }
 
     let ti, ei;
-    let p1, d1, p2, d2;
+    let p1, d1, p2, d2, p3, p4;
     let distance, scale, curve;
     let curves = [];
 
-    let tcolor = new THREE.Color();    
+    let tcolor = new Color();    
     tcolor.setStyle(style.color);
 
     const transp = true;
@@ -1297,14 +1312,14 @@ ispy.makeThickTracksRZ = function(tracks, extras, assocs, style, selection) {
 	ti = assocs[i][0][1];
 	ei = assocs[i][1][1];
 
-	p2 = new THREE.Vector3(...extras[ei][2]);
+	p2 = new Vector3(...extras[ei][2]);
 	
-	p1 = projectVector(new THREE.Vector3(...extras[ei][0]), p2);
-	d1 = projectVector(new THREE.Vector3(...extras[ei][1]), p2);
+	p1 = projectVector(new Vector3(...extras[ei][0]), p2);
+	d1 = projectVector(new Vector3(...extras[ei][1]), p2);
 	d1.normalize();
 	
 	p2 = projectVector(p2, p2);
-	d2 = projectVector(new THREE.Vector3(...extras[ei][3]), p2);
+	d2 = projectVector(new Vector3(...extras[ei][3]), p2);
 	d2.normalize();
 	
 	// What's all this then?
@@ -1320,23 +1335,23 @@ ispy.makeThickTracksRZ = function(tracks, extras, assocs, style, selection) {
 	distance = p1.distanceTo(p2);
 	scale = distance*0.25;
 	
-	p3 = new THREE.Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
-	p4 = new THREE.Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
+	p3 = new Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
+	p4 = new Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
 	
-	curve = new THREE.CubicBezierCurve3(p1,p3,p4,p2);
+	curve = new CubicBezierCurve3(p1,p3,p4,p2);
 
 	if ( ispy.use_line2 ) {
 
-	    let lg = new THREE.LineGeometry();
+	    let lg = new LineGeometry();
 	    let positions = [];
 	    curve.getPoints(32).forEach(function(p) { positions.push(p.x,p.y,p.z); });
 	    lg.setPositions(positions);
 
-	    let line = new THREE.Line2(lg, new THREE.LineMaterial({
+	    let line = new Line2(lg, createLineMaterial({
 		color:tcolor,
 		opacity:style.opacity,
 		transparent:transp,
-		linewidth:style.linewidth*0.001
+		linewidth:style.linewidth
 	    }));
 
 	    line.computeLineDistances();
@@ -1347,9 +1362,9 @@ ispy.makeThickTracksRZ = function(tracks, extras, assocs, style, selection) {
 
 	} else {
 
-	    let line = new THREE.Line(
-		new THREE.BufferGeometry().setFromPoints(curve.getPoints(32)),
-		new THREE.LineBasicMaterial({
+	    let line = new Line(
+		new BufferGeometry().setFromPoints(curve.getPoints(32)),
+		new LineBasicMaterial({
 		    color:tcolor,
 		    opacity:style.opacity,
 		    transparent: transp,
@@ -1370,17 +1385,17 @@ ispy.makeThickTracksRZ = function(tracks, extras, assocs, style, selection) {
 
 ispy.makeVertex = function(data,style) {
 
-    const geometry = new THREE.SphereGeometry(style.radius, 32, 32);
-    const hcolor = new THREE.Color(style.color);
+    const geometry = new SphereGeometry(style.radius, 32, 32);
+    const hcolor = new Color(style.color);
     const transp = true;
     
-    const material = new THREE.MeshBasicMaterial({
+    const material = new MeshBasicMaterial({
 	color:hcolor,
 	transparent: transp,
 	opacity:style.opacity
     });
     
-    const vertex = new THREE.Mesh(geometry, material);
+    const vertex = new Mesh(geometry, material);
     vertex.position.x = data[2][0];
     vertex.position.y = data[2][1];
     vertex.position.z = data[2][2];
@@ -1391,17 +1406,17 @@ ispy.makeVertex = function(data,style) {
 
 ispy.makeVertexCompositeCandidate = function(data,style) {
 
-    const geometry = new THREE.SphereGeometry(style.radius, 32, 32);
-    const hcolor = new THREE.Color(style.color);
+    const geometry = new SphereGeometry(style.radius, 32, 32);
+    const hcolor = new Color(style.color);
     const transp = true;
     
-    const material = new THREE.MeshBasicMaterial({
+    const material = new MeshBasicMaterial({
 	color:hcolor,
 	transparent: transp,
 	opacity:style.opacity
     });
     
-    const vertex = new THREE.Mesh(geometry, material);
+    const vertex = new Mesh(geometry, material);
     vertex.position.x = data[0][0];
     vertex.position.y = data[0][1];
     vertex.position.z = data[0][2];
@@ -1415,18 +1430,18 @@ ispy.makeSimVertex = function(data, style) {
     if ( data[1] !== -1 )
 	return null;
 
-    const geometry = new THREE.SphereGeometry(0.005,32,32);
-    const hcolor = new THREE.Color(style.color);
+    const geometry = new SphereGeometry(0.005,32,32);
+    const hcolor = new Color(style.color);
     
     const transp = true;
   
-    const material = new THREE.MeshBasicMaterial({
+    const material = new MeshBasicMaterial({
 	color:hcolor,
 	transparent: transp,
 	opacity:style.opacity
     });
     
-    const vertex = new THREE.Mesh(geometry, material);
+    const vertex = new Mesh(geometry, material);
     vertex.position.x = data[0][0];
     vertex.position.y = data[0][1];
     vertex.position.z = data[0][2];
@@ -1453,7 +1468,7 @@ ispy.makeCaloClusters = function(data, extra, assoc, style, selection) {
 
     }
 
-    var ccolor = new THREE.Color(style.color);
+    var ccolor = new Color(style.color);
     
     var transp = false;
   
@@ -1467,12 +1482,12 @@ ispy.makeCaloClusters = function(data, extra, assoc, style, selection) {
   
     for ( var k = 0; k < boxes.length; k++ ) {
     
-	clusters.push(new THREE.Mesh(boxes[k], 
-				     new THREE.MeshBasicMaterial({
+	clusters.push(new Mesh(boxes[k], 
+				     new MeshBasicMaterial({
 					 color:ccolor,
 					 transparent:transp,
 					 opacity:style.opacity,
-					 side:THREE.DoubleSide})
+					 side:DoubleSide})
 				    )
 		     );
     
@@ -1576,23 +1591,23 @@ ispy.makeCaloTower = function(data, egeometry, hgeometry, scale, selection) {
 
     if ( et > selection.min_energy ) {
 
-	let f1 = new THREE.Vector3(...data[ci]);
-	let f2 = new THREE.Vector3(...data[ci+1]);
-	let f3 = new THREE.Vector3(...data[ci+2]);
-	let f4 = new THREE.Vector3(...data[ci+3]);
+	let f1 = new Vector3(...data[ci]);
+	let f2 = new Vector3(...data[ci+1]);
+	let f3 = new Vector3(...data[ci+2]);
+	let f4 = new Vector3(...data[ci+3]);
     
-	let b1e = new THREE.Vector3(...data[ci+4]);
-	let b2e = new THREE.Vector3(...data[ci+5]);
-	let b3e = new THREE.Vector3(...data[ci+6]);
-	let b4e = new THREE.Vector3(...data[ci+7]);
+	let b1e = new Vector3(...data[ci+4]);
+	let b2e = new Vector3(...data[ci+5]);
+	let b3e = new Vector3(...data[ci+6]);
+	let b4e = new Vector3(...data[ci+7]);
 
 	let b1h = b1e;
 	let b2h = b2e;
 	let b3h = b3e;
 	let b4h = b4e;
 		
-	escale = scale*(emEnergy > 0 ? emEnergy*Math.sin(theta) : 0);
-	hscale = scale*(hadEnergy > 0 ? hadEnergy*Math.sin(theta) : 0);
+	let escale = scale*(emEnergy > 0 ? emEnergy*Math.sin(theta) : 0);
+	let hscale = scale*(hadEnergy > 0 ? hadEnergy*Math.sin(theta) : 0);
 
 	if ( escale > 0 ) {
     
@@ -1630,8 +1645,8 @@ ispy.makeCaloTower = function(data, egeometry, hgeometry, scale, selection) {
 	    addFace3(f2.toArray(), b2e.toArray(), b3e.toArray());
 	    addFace3(b3e.toArray(), f3.toArray(), f2.toArray());
 
-	    const ebox = new THREE.BufferGeometry();
-	    ebox.attributes.position = new THREE.BufferAttribute(
+	    const ebox = new BufferGeometry();
+	    ebox.attributes.position = new BufferAttribute(
 		new Float32Array(all_positions),
 		3
 	    );
@@ -1713,8 +1728,8 @@ ispy.makeCaloTower = function(data, egeometry, hgeometry, scale, selection) {
 	    addFace3(v[1].toArray(), v[5].toArray(), v[6].toArray());
 	    addFace3(v[6].toArray(), v[2].toArray(), v[1].toArray());
 
-	    const hbox = new THREE.BufferGeometry();
-	    hbox.attributes.position = new THREE.BufferAttribute(
+	    const hbox = new BufferGeometry();
+	    hbox.attributes.position = new BufferAttribute(
 		new Float32Array(all_positions),
 		3
 	    );
@@ -1778,7 +1793,7 @@ ispy.makeRPC = function(rpc) {
 
 ispy.makePointCloud = function(data, index) {
   
-    var geometry = new THREE.BufferGeometry();
+    var geometry = new BufferGeometry();
     var positions = new Float32Array(data.length*3);
 
     for (var i = 0; i < data.length; i++) {
@@ -1789,7 +1804,7 @@ ispy.makePointCloud = function(data, index) {
   
     }
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
     geometry.computeBoundingSphere();
     
     return geometry;
@@ -1798,7 +1813,7 @@ ispy.makePointCloud = function(data, index) {
 
 ispy.makePointCloudRZ = function(data, index) {
   
-    var geometry = new THREE.BufferGeometry();
+    var geometry = new BufferGeometry();
     var positions = new Float32Array(data.length*3);
 
     for (var i = 0; i < data.length; i++) {
@@ -1817,7 +1832,7 @@ ispy.makePointCloudRZ = function(data, index) {
   
     }
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
     geometry.computeBoundingSphere();
     
     return geometry;
@@ -1851,7 +1866,7 @@ ispy.makeTrackingClustersRZ = function(data) {
 ispy.makeArrow = function(dir, origin, length, color) {
 
     // dir, origin, length, hex, headLength, headWidth
-    const arrow = new THREE.ArrowHelper(
+    const arrow = new ArrowHelper(
 	dir, origin, length, color.getHex(),
 	0.2, 0.2
     );
@@ -1859,7 +1874,7 @@ ispy.makeArrow = function(dir, origin, length, color) {
     // radiusTop, radiusBottom, height, radialSegments, heightSegments
     // We want more radialSegements beyond the 5 used in ArrowHelper
     // to make a nicer arrowhead
-    arrow.cone.geometry = new THREE.CylinderGeometry(0, 0.5, 1, 24, 1);
+    arrow.cone.geometry = new CylinderGeometry(0, 0.5, 1, 24, 1);
     arrow.cone.geometry.translate(0, -1, 0);
 
     return arrow;
@@ -1875,15 +1890,15 @@ ispy.makeArrowThick = function(dir, origin, length, color, displacement) {
 	...dir.toArray()
     ];
 
-    const arrow = new THREE.Object3D();
+    const arrow = new Object3D();
     
-    const al = new THREE.Line2(
-	new THREE.LineGeometry().setPositions(
+    const al = new Line2(
+	new LineGeometry().setPositions(
 	    positions
 	),
-	new THREE.LineMaterial({
+	createLineMaterial({
 	    color: color,
-	    linewidth: 2*0.001
+	    linewidth: 2
 	})
     );
 
@@ -1893,17 +1908,17 @@ ispy.makeArrowThick = function(dir, origin, length, color, displacement) {
 
     const cl = 0.2;
     
-    const ac = new THREE.Mesh(
-	new THREE.CylinderGeometry(
+    const ac = new Mesh(
+	new CylinderGeometry(
 	    0, 0.1, cl, 24, 1
 	),
-	new THREE.MeshBasicMaterial({
+	new MeshBasicMaterial({
 	    color: color
 	})
     );
         
-    ac.geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,cl*0.5,0));
-    ac.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI/2));
+    ac.geometry.applyMatrix4(new Matrix4().makeTranslation(0,cl*0.5,0));
+    ac.geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
 
     ac.lookAt(dir);
     dir.setLength(length+displacement);
@@ -1939,11 +1954,11 @@ ispy.makeMET = function(data, style, selection) {
     // Clamp length of MET
     length = length+d > 5 ? 5 : length;
     
-    let dir = new THREE.Vector3(px,py,0);
+    let dir = new Vector3(px,py,0);
     dir.normalize();
        
-    let origin = new THREE.Vector3(0,0,0);    
-    let color = new THREE.Color(style.color);
+    let origin = new Vector3(0,0,0);    
+    let color = new Color(style.color);
 
     var met;
     
@@ -1970,7 +1985,7 @@ ispy.makeMET = function(data, style, selection) {
     
 };
 
-projectThetaPhi = function(theta, phi) {
+const projectThetaPhi = function(theta, phi) {
 
     let x = Math.cos(theta)*Math.sin(phi);
     let y = Math.sin(theta)*Math.sin(phi);
@@ -2009,7 +2024,7 @@ ispy.makeJet = function(data, style, selection) {
     let radius = 0.3 * (1.0 /(1 + 0.001));
     
     // radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded
-    const geometry = new THREE.CylinderGeometry(
+    const geometry = new CylinderGeometry(
 	radius,
 	0.0,
 	length,
@@ -2018,10 +2033,10 @@ ispy.makeJet = function(data, style, selection) {
 	true
     );
     
-    geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,length*0.5,0));
-    geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI/2));
+    geometry.applyMatrix4(new Matrix4().makeTranslation(0,length*0.5,0));
+    geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
 
-    let jcolor = new THREE.Color(style.color);
+    let jcolor = new Color(style.color);
     
     let transp = false;
     
@@ -2031,17 +2046,17 @@ ispy.makeJet = function(data, style, selection) {
   
     }
 
-    const material = new THREE.MeshBasicMaterial({
+    const material = new MeshBasicMaterial({
 	color:jcolor,
 	transparent: transp,
 	opacity:style.opacity
     });
 
-    material.side = THREE.DoubleSide;
+    material.side = DoubleSide;
     material.depthWrite = false;
     
-    const jet = new THREE.Mesh(geometry, material);
-    jet.lookAt(new THREE.Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
+    const jet = new Mesh(geometry, material);
+    jet.lookAt(new Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
     jet.visible = true;
 
     jet.userData.et = et;
@@ -2078,7 +2093,7 @@ ispy.makeJetRZ = function(data, style, selection) {
     let radius = 0.3 * (1.0 /(1 + 0.001));
     
     // radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded
-    const geometry = new THREE.CylinderGeometry(
+    const geometry = new CylinderGeometry(
 	radius,
 	0.0,
 	length,
@@ -2087,10 +2102,10 @@ ispy.makeJetRZ = function(data, style, selection) {
 	true
     );
     
-    geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,length*0.5,0));
-    geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI/2));
+    geometry.applyMatrix4(new Matrix4().makeTranslation(0,length*0.5,0));
+    geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
 
-    let jcolor = new THREE.Color(style.color);
+    let jcolor = new Color(style.color);
     
     let transp = false;
     
@@ -2100,23 +2115,23 @@ ispy.makeJetRZ = function(data, style, selection) {
   
     }
 
-    const material = new THREE.MeshBasicMaterial({
+    const material = new MeshBasicMaterial({
 	color:jcolor,
 	transparent: transp,
 	opacity:style.opacity
     });
 
-    material.side = THREE.DoubleSide;
+    material.side = DoubleSide;
     material.depthWrite = false;
     
-    const jet = new THREE.Mesh(geometry, material);
+    const jet = new Mesh(geometry, material);
     
     let angles = projectThetaPhi(theta, phi);
     st = Math.sin(angles[0]);
     cp = Math.cos(angles[1]);
     ct = Math.cos(angles[0]);
 
-    jet.lookAt(new THREE.Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
+    jet.lookAt(new Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
     jet.visible = true;
 
     jet.userData.et = et;
@@ -2139,7 +2154,7 @@ ispy.makeJetWithVertex = function(data, style, selection) {
     const theta = data[2];
     const phi = data[3];
 
-    const vertex = new THREE.Vector3(...data[4]);
+    const vertex = new Vector3(...data[4]);
     
     let ct = Math.cos(theta);
     let st = Math.sin(theta);
@@ -2157,7 +2172,7 @@ ispy.makeJetWithVertex = function(data, style, selection) {
     radius *= style.width;
     
     // radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded
-    const geometry = new THREE.CylinderGeometry(
+    const geometry = new CylinderGeometry(
 	radius,
 	0.0,
 	length,
@@ -2166,10 +2181,10 @@ ispy.makeJetWithVertex = function(data, style, selection) {
 	true
     );
     
-    geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,length*0.5,0));
-    geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI/2));
+    geometry.applyMatrix4(new Matrix4().makeTranslation(0,length*0.5,0));
+    geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
 
-    let jcolor = new THREE.Color(style.color);    
+    let jcolor = new Color(style.color);    
     let transp = false;
     
     if ( style.opacity < 1.0 ) {
@@ -2178,22 +2193,22 @@ ispy.makeJetWithVertex = function(data, style, selection) {
   
     }
 
-    const material = new THREE.MeshBasicMaterial({
+    const material = new MeshBasicMaterial({
 	color:jcolor,
 	transparent: transp,
 	opacity:style.opacity
     });
 
-    material.side = THREE.DoubleSide;
+    material.side = DoubleSide;
     material.depthWrite = false;
     
-    const jet = new THREE.Mesh(geometry, material);
+    const jet = new Mesh(geometry, material);
     
     jet.position.x = vertex.x;
     jet.position.y = vertex.y;
     jet.position.z = vertex.z;
 
-    jet.lookAt(new THREE.Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
+    jet.lookAt(new Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
     jet.visible = true;
     
     jet.userData.et = et;
@@ -2216,7 +2231,7 @@ ispy.makeJetWithVertexRZ = function(data, style, selection) {
     const theta = data[2];
     const phi = data[3];
 
-    const vertex = new THREE.Vector3(...data[4]);
+    const vertex = new Vector3(...data[4]);
     
     let ct = Math.cos(theta);
     let st = Math.sin(theta);
@@ -2234,7 +2249,7 @@ ispy.makeJetWithVertexRZ = function(data, style, selection) {
     radius *= style.width;
     
     // radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded
-    const geometry = new THREE.CylinderGeometry(
+    const geometry = new CylinderGeometry(
 	radius,
 	0.0,
 	length,
@@ -2243,10 +2258,10 @@ ispy.makeJetWithVertexRZ = function(data, style, selection) {
 	true
     );
     
-    geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,length*0.5,0));
-    geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI/2));
+    geometry.applyMatrix4(new Matrix4().makeTranslation(0,length*0.5,0));
+    geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
 
-    let jcolor = new THREE.Color(style.color);    
+    let jcolor = new Color(style.color);    
     let transp = false;
     
     if ( style.opacity < 1.0 ) {
@@ -2255,16 +2270,16 @@ ispy.makeJetWithVertexRZ = function(data, style, selection) {
   
     }
 
-    const material = new THREE.MeshBasicMaterial({
+    const material = new MeshBasicMaterial({
 	color:jcolor,
 	transparent: transp,
 	opacity:style.opacity
     });
 
-    material.side = THREE.DoubleSide;
+    material.side = DoubleSide;
     material.depthWrite = false;
     
-    const jet = new THREE.Mesh(geometry, material);
+    const jet = new Mesh(geometry, material);
     
     jet.position.x = vertex.x;
     jet.position.y = vertex.y;
@@ -2275,7 +2290,7 @@ ispy.makeJetWithVertexRZ = function(data, style, selection) {
     cp = Math.cos(angles[1]);
     ct = Math.cos(angles[0]);
     
-    jet.lookAt(new THREE.Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
+    jet.lookAt(new Vector3(length*0.5*st*cp, length*0.5*st*sp, length*0.5*ct));
     jet.visible = true;
     
     jet.userData.et = et;
@@ -2326,10 +2341,10 @@ ispy.makePhoton = function(data, style, selection) {
   
     }
     
-    let pt1 = new THREE.Vector3(x0, y0, z0);
-    let pt2 = new THREE.Vector3(x0+px*t, y0+py*t, z0+pz*t);
+    let pt1 = new Vector3(x0, y0, z0);
+    let pt2 = new Vector3(x0+px*t, y0+py*t, z0+pz*t);
     
-    let color = new THREE.Color(style.color);
+    let color = new Color(style.color);
 
     let photon;
 
@@ -2337,10 +2352,10 @@ ispy.makePhoton = function(data, style, selection) {
 
 	// For some reason LineDashedMaterial doesn't
 	// work for Line2 so use this material
-	const ldm =  new THREE.LineMaterial({
+	const ldm =  createLineMaterial({
 	    color: color,
 	    dashed: true,
-	    linewidth: style.linewidth*0.001,
+	    linewidth: style.linewidth,
 	    dashSize: 0.1,
 	    gapSize: 0.1
 	});
@@ -2348,8 +2363,8 @@ ispy.makePhoton = function(data, style, selection) {
 	ldm.defines.USE_DASH = ""; 
 	ldm.needsUpdate = true;
 	
-	photon = new THREE.Line2(
-	    new THREE.LineGeometry().setPositions(
+	photon = new Line2(
+	    new LineGeometry().setPositions(
 		[...pt1.toArray(), ...pt2.toArray()] 
 	    ),
 	    ldm
@@ -2357,11 +2372,11 @@ ispy.makePhoton = function(data, style, selection) {
 
     } else {
 
-	photon = new THREE.LineSegments(
-	    new THREE.BufferGeometry().setFromPoints(
+	photon = new LineSegments(
+	    new BufferGeometry().setFromPoints(
 		[pt1, pt2]
 	    ),
-	    new THREE.LineDashedMaterial({
+	    new LineDashedMaterial({
 		color: color,
 		scale: 1,
 		dashSize: 0.1,
@@ -2420,11 +2435,11 @@ ispy.makePhotonRZ = function(data, style, selection) {
   
     }
     
-    let pt2 = new THREE.Vector3(x0+px*t, y0+py*t, z0+pz*t);
-    let pt1 = projectVector(new THREE.Vector3(x0, y0, z0), pt2);
+    let pt2 = new Vector3(x0+px*t, y0+py*t, z0+pz*t);
+    let pt1 = projectVector(new Vector3(x0, y0, z0), pt2);
     pt2 = projectVector(pt2, pt2);
     
-    let color = new THREE.Color(style.color);
+    let color = new Color(style.color);
 
     let photon;
 
@@ -2432,10 +2447,10 @@ ispy.makePhotonRZ = function(data, style, selection) {
 
 	// For some reason LineDashedMaterial doesn't
 	// work for Line2 so use this material
-	const ldm =  new THREE.LineMaterial({
+	const ldm =  createLineMaterial({
 	    color: color,
 	    dashed: true,
-	    linewidth: style.linewidth*0.001,
+	    linewidth: style.linewidth,
 	    dashSize: 0.1,
 	    gapSize: 0.1
 	});
@@ -2443,8 +2458,8 @@ ispy.makePhotonRZ = function(data, style, selection) {
 	ldm.defines.USE_DASH = ""; 
 	ldm.needsUpdate = true;
 	
-	photon = new THREE.Line2(
-	    new THREE.LineGeometry().setPositions(
+	photon = new Line2(
+	    new LineGeometry().setPositions(
 		[...pt1.toArray(), ...pt2.toArray()] 
 	    ),
 	    ldm
@@ -2452,11 +2467,11 @@ ispy.makePhotonRZ = function(data, style, selection) {
 
     } else {
 
-	photon = new THREE.LineSegments(
-	    new THREE.BufferGeometry().setFromPoints(
+	photon = new LineSegments(
+	    new BufferGeometry().setFromPoints(
 		[pt1, pt2]
 	    ),
-	    new THREE.LineDashedMaterial({
+	    new LineDashedMaterial({
 		color: color,
 		scale: 1,
 		dashSize: 0.1,
@@ -2495,15 +2510,15 @@ ispy.makeProtons = function(data, style, selection) {
     const py = data[6];
     const pz = data[7];
     
-    let dir = new THREE.Vector3(px,py,pz);
+    let dir = new Vector3(px,py,pz);
     dir.normalize();
        
-    let origin = new THREE.Vector3(x0,y0,z0);
+    let origin = new Vector3(x0,y0,z0);
 
     let length = Math.abs(pz)*0.01;
     length -= 0.75*65;
     
-    let color = new THREE.Color(style.color);
+    let color = new Color(style.color);
 
     var proton;
 
@@ -2526,20 +2541,20 @@ ispy.makeProtons = function(data, style, selection) {
     const radius = xi*10;
     const thickness = 0.05;
 
-    const rg = new THREE.RingGeometry(
+    const rg = new RingGeometry(
 	radius, // inner radius
 	radius + thickness, // outer radius
 	32 // theta segments
     );
 
-    rg.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI/2));
+    rg.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
     
-    const rm = new THREE.MeshBasicMaterial({
+    const rm = new MeshBasicMaterial({
 	color: color,
-	side: THREE.DoubleSide
+	side: DoubleSide
     });
     
-    const ring = new THREE.Mesh(rg, rm);
+    const ring = new Mesh(rg, rm);
     ring.name = "ring";
 
     // Note that coordinates are
@@ -2569,22 +2584,22 @@ ispy.makeDTRecHits = function(data) {
 	all_positions = all_positions.concat(...vectors);
     };
     
-    let pos = new THREE.Vector3(...data[7]);
-    let axis = new THREE.Vector3(...data[14]);
+    let pos = new Vector3(...data[7]);
+    let axis = new Vector3(...data[14]);
     let angle = data[15];
     
     let w = data[16]*0.5;
     let h = data[17]*0.5;
     let d = data[18]*0.5;
 
-    let v0 = new THREE.Vector3(-w, h,-d);
-    let v1 = new THREE.Vector3( w, h,-d);
-    let v2 = new THREE.Vector3( w, h, d);
-    let v3 = new THREE.Vector3(-w, h, d);
-    let v4 = new THREE.Vector3(-w,-h, d);
-    let v5 = new THREE.Vector3( w,-h, d);
-    let v6 = new THREE.Vector3( w,-h,-d);
-    let v7 = new THREE.Vector3(-w,-h,-d);
+    let v0 = new Vector3(-w, h,-d);
+    let v1 = new Vector3( w, h,-d);
+    let v2 = new Vector3( w, h, d);
+    let v3 = new Vector3(-w, h, d);
+    let v4 = new Vector3(-w,-h, d);
+    let v5 = new Vector3( w,-h, d);
+    let v6 = new Vector3( w,-h,-d);
+    let v7 = new Vector3(-w,-h,-d);
     
     //front
     addFace3(v0.toArray(), v1.toArray(), v2.toArray());
@@ -2605,14 +2620,14 @@ ispy.makeDTRecHits = function(data) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const box = new THREE.BufferGeometry();
-    box.attributes.position = new THREE.BufferAttribute(
+    const box = new BufferGeometry();
+    box.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions),
 	3
     );
     
-    box.applyMatrix4(new THREE.Matrix4().makeRotationAxis(axis,angle));
-    box.applyMatrix4(new THREE.Matrix4().makeTranslation(pos.x,pos.y,pos.z));
+    box.applyMatrix4(new Matrix4().makeRotationAxis(axis,angle));
+    box.applyMatrix4(new Matrix4().makeTranslation(pos.x,pos.y,pos.z));
     
     return [box];
 
@@ -2633,24 +2648,24 @@ ispy.makeDTRecHitsRZ = function(data) {
 	all_positions = all_positions.concat(...vectors);
     };
     
-    let pos = new THREE.Vector3(...data[7]);
-    let axis = new THREE.Vector3(...data[14]);
+    let pos = new Vector3(...data[7]);
+    let axis = new Vector3(...data[14]);
     let angle = data[15];
     
     let w = data[16]*0.5;
     let h = data[17]*0.5;
     let d = data[18]*0.5;
 
-    let lglobalpos = new THREE.Vector3(...data[12]);
+    let lglobalpos = new Vector3(...data[12]);
     
-    let v0 = projectVector(new THREE.Vector3(-w, h,-d), lglobalpos);
-    let v1 = projectVector(new THREE.Vector3( w, h,-d), lglobalpos);
-    let v2 = projectVector(new THREE.Vector3( w, h, d), lglobalpos);
-    let v3 = projectVector(new THREE.Vector3(-w, h, d), lglobalpos);
-    let v4 = projectVector(new THREE.Vector3(-w,-h, d), lglobalpos);
-    let v5 = projectVector(new THREE.Vector3( w,-h, d), lglobalpos);
-    let v6 = projectVector(new THREE.Vector3( w,-h,-d), lglobalpos);
-    let v7 = projectVector(new THREE.Vector3(-w,-h,-d), lglobalpos);
+    let v0 = projectVector(new Vector3(-w, h,-d), lglobalpos);
+    let v1 = projectVector(new Vector3( w, h,-d), lglobalpos);
+    let v2 = projectVector(new Vector3( w, h, d), lglobalpos);
+    let v3 = projectVector(new Vector3(-w, h, d), lglobalpos);
+    let v4 = projectVector(new Vector3(-w,-h, d), lglobalpos);
+    let v5 = projectVector(new Vector3( w,-h, d), lglobalpos);
+    let v6 = projectVector(new Vector3( w,-h,-d), lglobalpos);
+    let v7 = projectVector(new Vector3(-w,-h,-d), lglobalpos);
     
     //front
     addFace3(v0.toArray(), v1.toArray(), v2.toArray());
@@ -2671,14 +2686,14 @@ ispy.makeDTRecHitsRZ = function(data) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const box = new THREE.BufferGeometry();
-    box.attributes.position = new THREE.BufferAttribute(
+    const box = new BufferGeometry();
+    box.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions),
 	3
     );
     
-    box.applyMatrix4(new THREE.Matrix4().makeRotationAxis(axis,angle));
-    box.applyMatrix4(new THREE.Matrix4().makeTranslation(pos.x,pos.y,pos.z));
+    box.applyMatrix4(new Matrix4().makeRotationAxis(axis,angle));
+    box.applyMatrix4(new Matrix4().makeTranslation(pos.x,pos.y,pos.z));
     
     return [box];
 
@@ -2690,27 +2705,27 @@ ispy.makeRPCRecHits = function(data) {
     
     if ( ispy.use_line2 ) {
     
-	u = new THREE.LineGeometry();
+	u = new LineGeometry();
 	u.setPositions([...data[0], ...data[1]]);
 
-	v = new THREE.LineGeometry();
+	v = new LineGeometry();
 	v.setPositions([...data[2], ...data[3]]);
 
-	w = new THREE.LineGeometry();
+	w = new LineGeometry();
 	w.setPositions([...data[4], ...data[5]]);
 	
     } else {
 	
-	const u1 = new THREE.Vector3(...data[0]);
-	const u2 = new THREE.Vector3(...data[1]);
-	const v1 = new THREE.Vector3(...data[2]);
-	const v2 = new THREE.Vector3(...data[3]);
-	const w1 = new THREE.Vector3(...data[4]);
-	const w2 = new THREE.Vector3(...data[5]);
+	const u1 = new Vector3(...data[0]);
+	const u2 = new Vector3(...data[1]);
+	const v1 = new Vector3(...data[2]);
+	const v2 = new Vector3(...data[3]);
+	const w1 = new Vector3(...data[4]);
+	const w2 = new Vector3(...data[5]);
 
-	u = new THREE.BufferGeometry().setFromPoints([u1,u2]);
-	v = new THREE.BufferGeometry().setFromPoints([v1,v2]);
-	w = new THREE.BufferGeometry().setFromPoints([w1,w2]);
+	u = new BufferGeometry().setFromPoints([u1,u2]);
+	v = new BufferGeometry().setFromPoints([v1,v2]);
+	w = new BufferGeometry().setFromPoints([w1,w2]);
 	
     }
 
@@ -2724,19 +2739,19 @@ ispy.makeRPCRecHitsRZ = function(data) {
     
     if ( ispy.use_line2 ) {
     
-	u = new THREE.LineGeometry();
+	u = new LineGeometry();
 	u.setPositions([
 	    ...projectPoint(data[0], data[0]),
 	    ...projectPoint(data[1], data[0])
 	]);
 
-	v = new THREE.LineGeometry();
+	v = new LineGeometry();
 	v.setPositions([
 	    ...projectPoint(data[2], data[0]),
 	    ...projectPoint(data[3], data[0])
 	]);
 
-	w = new THREE.LineGeometry();
+	w = new LineGeometry();
 	w.setPositions([
 	    ...projectPoint(data[4], data[0]),
 	    ...projectPoint(data[5], data[0])
@@ -2744,24 +2759,24 @@ ispy.makeRPCRecHitsRZ = function(data) {
 	
     } else {
 	
-	const u1 = new THREE.Vector3(...data[0]);
-	const u2 = new THREE.Vector3(...data[1]);
-	const v1 = new THREE.Vector3(...data[2]);
-	const v2 = new THREE.Vector3(...data[3]);
-	const w1 = new THREE.Vector3(...data[4]);
-	const w2 = new THREE.Vector3(...data[5]);
+	const u1 = new Vector3(...data[0]);
+	const u2 = new Vector3(...data[1]);
+	const v1 = new Vector3(...data[2]);
+	const v2 = new Vector3(...data[3]);
+	const w1 = new Vector3(...data[4]);
+	const w2 = new Vector3(...data[5]);
 	
-	u = new THREE.BufferGeometry().setFromPoints([
+	u = new BufferGeometry().setFromPoints([
 	    projectVector(u1,u1),
 	    projectVector(u2,u1)
 	]);
 
-	v = new THREE.BufferGeometry().setFromPoints([
+	v = new BufferGeometry().setFromPoints([
 	    projectVector(v1,u1),
 	    projectVector(v2,u1)
 	]);
 
-	w = new THREE.BufferGeometry().setFromPoints([
+	w = new BufferGeometry().setFromPoints([
 	    projectVector(w1,u1),
 	    projectVector(w2,u1)
 	]);
@@ -2802,14 +2817,14 @@ ispy.makeDTRecSegments = function(data) {
     
     if ( ispy.use_line2 ) {
     
-	geometry = new THREE.LineGeometry();
+	geometry = new LineGeometry();
 	geometry.setPositions([...data[1], ...data[2]]);
 
     } else {
 		
-	geometry = new THREE.BufferGeometry().setFromPoints([
-	    new THREE.Vector3(...data[1]),
-	    new THREE.Vector3(...data[2])
+	geometry = new BufferGeometry().setFromPoints([
+	    new Vector3(...data[1]),
+	    new Vector3(...data[2])
 	]);
 
     }
@@ -2824,7 +2839,7 @@ ispy.makeDTRecSegmentsRZ = function(data) {
     
     if ( ispy.use_line2 ) {
     
-	geometry = new THREE.LineGeometry();
+	geometry = new LineGeometry();
 	geometry.setPositions([
 	    ...projectPoint(data[1], data[1]),
 	    ...projectPoint(data[2], data[1])
@@ -2832,10 +2847,10 @@ ispy.makeDTRecSegmentsRZ = function(data) {
 
     } else {
 		
-	let p1 = new THREE.Vector3(...data[1]);
-	let p2 = new THREE.Vector3(...data[2]);
+	let p1 = new Vector3(...data[1]);
+	let p2 = new Vector3(...data[2]);
 	
-	geometry = new THREE.BufferGeometry().setFromPoints([
+	geometry = new BufferGeometry().setFromPoints([
 	    projectVector(p1,p2),
 	    projectVector(p2,p2)
 	]);
@@ -2872,23 +2887,23 @@ ispy.makeCSCDigis = function(data, w, d, rotate) {
 	all_positions = all_positions.concat(...vectors);
     };
     
-    var pos = new THREE.Vector3(...data[0]);
+    var pos = new Vector3(...data[0]);
     var h = data[1]*0.5;
 
     w *= 0.5;
     d *= 0.5;
 
-    var axis = new THREE.Vector3(0.0, 0.0, 1.0);
+    var axis = new Vector3(0.0, 0.0, 1.0);
     var angle = -Math.atan2(pos.x, pos.y) - rotate;
 
-    let v0 = new THREE.Vector3(-w, h,-d);
-    let v1 = new THREE.Vector3( w, h,-d);
-    let v2 = new THREE.Vector3( w, h, d);
-    let v3 = new THREE.Vector3(-w, h, d);
-    let v4 = new THREE.Vector3(-w,-h, d);
-    let v5 = new THREE.Vector3( w,-h, d);
-    let v6 = new THREE.Vector3( w,-h,-d);
-    let v7 = new THREE.Vector3(-w,-h,-d);
+    let v0 = new Vector3(-w, h,-d);
+    let v1 = new Vector3( w, h,-d);
+    let v2 = new Vector3( w, h, d);
+    let v3 = new Vector3(-w, h, d);
+    let v4 = new Vector3(-w,-h, d);
+    let v5 = new Vector3( w,-h, d);
+    let v6 = new Vector3( w,-h,-d);
+    let v7 = new Vector3(-w,-h,-d);
     
     // front
     addFace3(v0.toArray(), v1.toArray(), v2.toArray());
@@ -2909,14 +2924,14 @@ ispy.makeCSCDigis = function(data, w, d, rotate) {
     addFace3(v1.toArray(), v5.toArray(), v6.toArray());
     addFace3(v6.toArray(), v2.toArray(), v1.toArray());
 
-    const box = new THREE.BufferGeometry();
-    box.attributes.position = new THREE.BufferAttribute(
+    const box = new BufferGeometry();
+    box.attributes.position = new BufferAttribute(
 	new Float32Array(all_positions),
 	3
     );
     
-    box.applyMatrix4(new THREE.Matrix4().makeRotationAxis(axis,angle));
-    box.applyMatrix4(new THREE.Matrix4().makeTranslation(pos.x,pos.y,pos.z));
+    box.applyMatrix4(new Matrix4().makeRotationAxis(axis,angle));
+    box.applyMatrix4(new Matrix4().makeTranslation(pos.x,pos.y,pos.z));
 
     return [box];
 
@@ -2928,14 +2943,14 @@ ispy.makeCSCDigis_V2 = function(data) {
     
     if ( ispy.use_line2 ) {
 	
-	geometry = new THREE.LineGeometry()
+	geometry = new LineGeometry()
 	geometry.setPositions([...data[0], ...data[1]]);
     
     } else {
     
-	geometry = new THREE.BufferGeometry().setFromPoints([
-	    new THREE.Vector3(...data[0]),
-	    new THREE.Vector3(...data[1])
+	geometry = new BufferGeometry().setFromPoints([
+	    new Vector3(...data[0]),
+	    new Vector3(...data[1])
 	]);
 
     }
@@ -2950,14 +2965,14 @@ ispy.makeGEMDigis_V2 = function(data) {
     
     if ( ispy.use_line2) {
     
-	geometry = new THREE.LineGeometry();
+	geometry = new LineGeometry();
 	geometry.setPositions([...data[0], ...data[1]]);
 	
     } else {
 
-	geometry = new THREE.BufferGeometry().setFromPoints([
-	    new THREE.Vector3(...data[0]),
-	    new THREE.Vector3(...data[1])
+	geometry = new BufferGeometry().setFromPoints([
+	    new Vector3(...data[0]),
+	    new Vector3(...data[1])
 	]);
 
     }
@@ -2995,22 +3010,22 @@ ispy.makeCSCLCTCorrelatedLCTDigis = function(data) {
 
     if ( ispy.use_line2 ) {
 
-	l1 = new THREE.LineGeometry();
+	l1 = new LineGeometry();
 	l1.setPositions([...data[0], ...data[1]]);
 
-	l2 = new THREE.LineGeometry();
+	l2 = new LineGeometry();
 	l2.setPositions([...data[2], ...data[3]]);
 
     } else {
 
-	l1 = new THREE.BufferGeometry().setFromPoints([
-	    new THREE.Vector3(...data[0]),
-	    new THREE.Vector3(...data[1])
+	l1 = new BufferGeometry().setFromPoints([
+	    new Vector3(...data[0]),
+	    new Vector3(...data[1])
 	]);
 
-	l2 = new THREE.BufferGeometry().setFromPoints([
-	    new THREE.Vector3(...data[2]),
-	    new THREE.Vector3(...data[3])
+	l2 = new BufferGeometry().setFromPoints([
+	    new Vector3(...data[2]),
+	    new Vector3(...data[3])
 	]);
 
     }
