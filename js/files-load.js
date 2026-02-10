@@ -116,41 +116,46 @@ ispy.loadEvent = function() {
 	ispy.toggleCollapse('Detector');
     }
     
-    let event;
+    ispy.ig_data.file(ispy.event_list[ispy.event_index]).async("string").then(function(text) {
 
-    try {
-	
-	event = JSON.parse(ispy.cleanupData(ispy.ig_data.file(ispy.event_list[ispy.event_index]).asText()));
-  
-    } catch(err) {
-    
-	alert(err);
-    
-    }
+	let event;
 
-    ispy.closeDialog('#loading');
+	try {
 
-    if ( ispy.isGeometry ) {
+	    event = JSON.parse(ispy.cleanupData(text));
 
-	Object.assign(ispy.detector, event);
-	ispy.addDetector();
-	ispy.isGeometry = false;
+	} catch(err) {
 
-    } else {
+	    alert(err);
+	    ispy.closeDialog('#loading');
+	    return;
 
-	ispy.addEvent(event);
-	ispy.enableNextPrev();
-	
-	let ievent = +ispy.event_index + 1; // JavaScript!
+	}
 
-	document.getElementById('event-loaded').innerHTML = ispy.file_name + ":" + ispy.event_list[ispy.event_index] + "  [" + ievent + " of " + ispy.event_list.length + "]";
-	//$("#event-loaded").html(ispy.file_name + ":" + ispy.event_list[ispy.event_index] + "  [" + ievent + " of " + ispy.event_list.length + "]");
-	
-	console.log(ispy.current_event.Types);
-	console.log(ispy.current_event.Collections.Products_V1);
-	
-    }
-    
+	ispy.closeDialog('#loading');
+
+	if ( ispy.isGeometry ) {
+
+	    Object.assign(ispy.detector, event);
+	    ispy.addDetector();
+	    ispy.isGeometry = false;
+
+	} else {
+
+	    ispy.addEvent(event);
+	    ispy.enableNextPrev();
+
+	    let ievent = +ispy.event_index + 1; // JavaScript!
+
+	    document.getElementById('event-loaded').innerHTML = ispy.file_name + ":" + ispy.event_list[ispy.event_index] + "  [" + ievent + " of " + ispy.event_list.length + "]";
+
+	    console.log(ispy.current_event.Types);
+	    console.log(ispy.current_event.Collections.Products_V1);
+
+	}
+
+    });
+
 };
 
 ispy.nextEvent = function() {
@@ -181,14 +186,16 @@ ispy.selectLocalFile = function(index) {
     ispy.file_name = ispy.local_files[index].name;
 
     reader.onload = function(e) {
-    
+
 	var data = e.target.result;
-	var zip = new JSZip(data);
-	var event_list = [];
 
-	Object.entries(zip.files).forEach(([index, zipEntry]) => {
+	JSZip.loadAsync(data).then(function(zip) {
 
-		if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
+	    var event_list = [];
+
+	    Object.entries(zip.files).forEach(([index, zipEntry]) => {
+
+		if ( !zipEntry.dir && zipEntry.name !== 'Header' ) {
 
 		    if ( zipEntry.name.split('/')[0] === 'Geometry' ) {
 
@@ -200,11 +207,13 @@ ispy.selectLocalFile = function(index) {
 		}
 	    });
 
-	ispy.event_list = event_list;
-	ispy.event_index = 0;
-	ispy.updateEventList();
-	ispy.ig_data = zip;
-    
+	    ispy.event_list = event_list;
+	    ispy.event_index = 0;
+	    ispy.updateEventList();
+	    ispy.ig_data = zip;
+
+	});
+
     };
 
     reader.onerror = function(e) {
@@ -274,34 +283,37 @@ ispy.loadDroppedFile = function(file) {
     reader.onload = function(e) {
 
 	var data = e.target.result;
-	var zip = new JSZip(data);
 
-	var event_list = [];
+	JSZip.loadAsync(data).then(function(zip) {
 
-	Object.entries(zip.files).forEach(([index, zipEntry]) => {
+	    var event_list = [];
 
-	    if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
+	    Object.entries(zip.files).forEach(([index, zipEntry]) => {
 
-		if ( zipEntry.name.split('/')[0] === 'Geometry' ) {
+		if ( !zipEntry.dir && zipEntry.name !== 'Header' ) {
 
-		    ispy.isGeometry = true;
+		    if ( zipEntry.name.split('/')[0] === 'Geometry' ) {
+
+			ispy.isGeometry = true;
+
+		    }
+
+		    event_list.push(zipEntry.name);
 
 		}
 
-		event_list.push(zipEntry.name);
+	    });
 
-	    }
+	    ispy.event_list = event_list;
+	    ispy.event_index = 0;
+	    ispy.updateEventList();
+	    ispy.ig_data = zip;
+
+	    ispy.loadEvent();
+
+	    ispy.closeDialog('#loading');
 
 	});
-
-	ispy.event_list = event_list;
-	ispy.event_index = 0;
-	ispy.updateEventList();
-	ispy.ig_data = zip;
-
-	ispy.loadEvent();
-
-	ispy.closeDialog('#loading');
 
     };
 
@@ -326,7 +338,7 @@ ispy.selectFile = function(filename) {
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", filename, true);
-    xhr.overrideMimeType("text/plain; charset=x-user-defined");
+    xhr.responseType = "arraybuffer";
 
     ispy.clearTable("browser-events");
     var ecell = document.getElementById("browser-events").insertRow(0).insertCell(0);
@@ -369,26 +381,29 @@ ispy.selectFile = function(filename) {
 
 	if ( this.status === 200 ) {
 
-	    var zip = JSZip(xhr.responseText);
-	    var event_list = [];
+	    JSZip.loadAsync(xhr.response).then(function(zip) {
 
-	    Object.entries(zip.files).forEach(([index, zipEntry]) => {
+		var event_list = [];
 
-		if ( zipEntry._data !== null && zipEntry.name !== 'Header' ) {
+		Object.entries(zip.files).forEach(([index, zipEntry]) => {
 
-		    event_list.push(zipEntry.name);
+		    if ( !zipEntry.dir && zipEntry.name !== 'Header' ) {
 
-		}
+			event_list.push(zipEntry.name);
+
+		    }
+
+		});
+
+		ispy.event_list = event_list;
+		ispy.event_index = 0;
+		ispy.updateEventList();
+		ispy.ig_data = zip;
 
 	    });
 
-	    ispy.event_list = event_list;
-	    ispy.event_index = 0;
-	    ispy.updateEventList();
-	    ispy.ig_data = zip;
-	
 	}
-  
+
     };
 
     xhr.send();
