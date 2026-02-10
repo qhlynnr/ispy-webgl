@@ -54,15 +54,13 @@ ispy.setTransparency = function(t) {
 
     let imported = ispy.scene.getObjectByName('Imported');
 
-    imported.children.forEach(function(obj) {
-    
-	obj.children.forEach(function(c) {
-      
+    imported.traverse(function(c) {
+
+	if (c.material) {
 	    c.material.transparent = true;
 	    c.material.opacity = t;
-    
-	});
-	    
+	}
+
     });
 
 };
