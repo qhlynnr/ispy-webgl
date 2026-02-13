@@ -598,6 +598,16 @@ ispy.event_description = {
 	"SimVertices_V1": {
 	    type:ispy.SHAPE, on:false, group:"Physics", name: "Vertices (Sim)",
 	    fn:ispy.makeSimVertex, style: {color: "rgb(80%, 20%, 0%)", opacity: 0.9}
+	},
+	"ChargedCandidates_V1": {
+	    type:ispy.ASSOC, on:true, group:"Physics", name:"Charged Candidates (PF)",
+            extra:"Extras_V1", assoc:"ChargedCandidateExtras_V1",
+            fn:ispy.makeChargedCandidates, style: {color: "rgb(10%, 100%, 10%)", opacity: 1, linewidth: 3},
+            selection: {"min_pt":0.0, "index":2}
+	},
+	"NeutralCandidates_V1": {
+	    type: ispy.SHAPE, on: false, group: "Physics", name: "Neutral Candidates (PF)",
+            fn: ispy.makeNeutralCandidates, style: {color: "rgb(100%, 0%, 0%)", opacity: 1.0, linewidth: 2}, selection: {"min_energy":0.0}
 	}
 	
     },

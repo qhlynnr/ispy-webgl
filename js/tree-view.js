@@ -257,7 +257,7 @@ ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 
     if ( ispy.use_line2 ) {
 
-	if ( key.includes('GlobalMuon') || key.includes('Electron') || key.includes('Photon') ) {
+	if ( key.includes('GlobalMuon') || key.includes('Electron') || key.includes('Photon') || key.includes('Candidates') ) {
 	
 	    sf.add(row_obj, 'linewidth', 1, 5).onChange(function() {
 
@@ -351,6 +351,7 @@ ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 
     }
 
+    if ( ! key.includes('Candidates') )
     sf.addColor(row_obj, 'color').onChange(function() {
 
 	ispy.views.forEach(v => {

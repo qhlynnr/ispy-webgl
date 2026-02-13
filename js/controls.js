@@ -308,7 +308,11 @@ ispy.exportScene = function() {
 
     exporter.parse(ispy.scene, function(result) {
 
-	ispy.exportArrayBuffer(result, 'scene.glb'); 
+	ispy.exportArrayBuffer(result, 'scene.glb');
+
+    }, function(error) {
+
+	console.error('Error exporting scene:', error);
 
     }, options);
 
@@ -390,15 +394,19 @@ ispy.exportGLTF = function(binary) {
 
 			if ( result instanceof ArrayBuffer ) {
 
-			    ispy.exportArrayBuffer(result, o.name+'.glb'); 
-			    
+			    ispy.exportArrayBuffer(result, o.name+'.glb');
+
 			} else {
 
 			    const output = JSON.stringify(result, null, 2);
 			    ispy.exportString(output, o.name+'.gltf');
 
 			}
-			
+
+		    }, function(error) {
+
+			console.error('Error exporting:', error);
+
 		    }, options);
 
 		}

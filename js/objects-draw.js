@@ -1285,6 +1285,102 @@ ispy.makeThickTracks = function(tracks, extras, assocs, style, selection) {
 
 };
 
+ispy.makeChargedCandidates = function(tracks, extras, assocs, style, selection) {
+  
+    if ( ! assocs ) {
+    
+	throw "No association!";
+  
+    }
+
+    let ti, ei;
+    let p1, d1, p2, d2, p3, p4;
+    let distance, scale, curve;
+    let curves = [];
+
+    const transp = true;
+
+    for ( let i = 0; i < assocs.length; i++ ) {
+
+	let pt = tracks[i][selection.index];
+	let eta = tracks[i][4];
+	let phi = tracks[i][3];
+
+	ti = assocs[i][0][1];
+	ei = assocs[i][1][1];
+
+	p1 = new Vector3(...extras[ei][0]);
+	d1 = new Vector3(...extras[ei][1]);
+	d1.normalize();
+
+	p2 = new Vector3(...extras[ei][2]);
+	d2 = new Vector3(...extras[ei][3]);
+	d2.normalize();
+
+	distance = p1.distanceTo(p2);
+	scale = distance*0.25;
+
+	p3 = new Vector3(p1.x+scale*d1.x, p1.y+scale*d1.y, p1.z+scale*d1.z);
+	p4 = new Vector3(p2.x-scale*d2.x, p2.y-scale*d2.y, p2.z-scale*d2.z);
+
+	curve = new CubicBezierCurve3(p1,p3,p4,p2);
+
+	let tcolor = new Color();
+	let ptyp = tracks[i][7];
+	
+	if ( ptyp == 1 ) { // charged hadron
+	    tcolor.setStyle("#00ff00");
+	} else if ( ptyp == 2 ) { // electron
+	    tcolor.setStyle("#ffff00");
+	} else if ( ptyp == 3 ) { // muon
+	    tcolor.setStyle("#00ffff");
+	} else {
+	    tcolor.setStyle(style.color);
+	}
+
+	if ( ispy.use_line2 ) {
+
+	    let lg = new LineGeometry();
+	    let positions = [];
+	    curve.getPoints(32).forEach(function(p) { positions.push(p.x,p.y,p.z); });
+	    lg.setPositions(positions);
+
+	    let line = new Line2(lg, createLineMaterial({
+		color:tcolor,
+		opacity:style.opacity,
+		transparent:transp,
+		linewidth:style.linewidth
+	    }));
+
+	    line.computeLineDistances();
+
+	    line.userData.pt = pt;
+	    line.visible = pt > selection.min_pt ? true : false;
+	    curves.push(line);
+	    
+	} else {
+
+	    let line = new Line(
+		new BufferGeometry().setFromPoints(curve.getPoints(32)),
+		new LineBasicMaterial({
+		    color:tcolor,
+		    opacity:style.opacity,
+		    transparent: transp,
+		})
+	    );
+
+	    line.userData.pt = pt;
+	    line.visible = pt > selection.min_pt ? true : false;
+	    curves.push(line);
+
+	}
+
+    }
+
+    return curves;
+
+};
+
 ispy.makeThickTracksRZ = function(tracks, extras, assocs, style, selection) {
   
     if ( ! assocs ) {
@@ -2381,6 +2477,109 @@ ispy.makePhoton = function(data, style, selection) {
 		scale: 1,
 		dashSize: 0.1,
 		gapSize: 0.1
+	    })
+	);
+	
+    }
+
+    photon.computeLineDistances();
+    photon.userData.energy = energy;
+
+    if ( energy < selection.min_energy ) {
+	
+        photon.visible = false;
+	
+    }
+
+    return photon;
+
+};
+
+ispy.makeNeutralCandidates = function(data, style, selection) {
+
+    const lEB = 3.0;  // half-length of the EB (m)
+    const rEB = 1.24; // inner radius of the EB (m)
+    
+    const eta = data[2];
+    const phi = data[3];
+    
+    const energy = data[0];
+
+    const px = Math.cos(phi);
+    const py = Math.sin(phi);
+    const pz = (Math.pow(Math.E, eta) - Math.pow(Math.E, -eta))/2;
+
+    let t = 0.0;
+    
+    const x0 = data[4][0];
+    const y0 = data[4][1];
+    const z0 = data[4][2];
+
+    if ( Math.abs(eta) > 1.48 ) { // i.e. not in the EB, so propagate to ES
+    
+	t = Math.abs((lEB - z0)/pz);
+  
+    } else { // propagate to EB
+    
+	let a = px*px + py*py;
+	let b = 2*x0*px + 2*y0*py;
+	let c = x0*x0 + y0*y0 - rEB*rEB;
+	t = (-b+Math.sqrt(b*b-4*a*c))/2*a;
+  
+    }
+    
+    let pt1 = new Vector3(x0, y0, z0);
+    let pt2 = new Vector3(x0+px*t, y0+py*t, z0+pz*t);
+    
+    let color = new Color();
+
+    let ptyp = data[6];
+
+    if ( ptyp === 4 ) { // photon                                                                                                                                                
+        color.setStyle("#ff0000");
+    } else if ( ptyp === 5 ) { // neutral hadron
+        color.setStyle("#ffa500");
+    } else if ( ptyp === 6 ) { // hf tower to hadron
+        color.setStyle("#ff00ff");
+    } else if ( ptyp === 7 ) { // hf tower to EM
+	color.setStyle("#0000ff");
+    } else {
+        color.setStyle(style.color);
+    }
+
+    let photon;
+
+    if ( ispy.use_line2 ) {
+
+	// For some reason LineDashedMaterial doesn't
+	// work for Line2 so use this material
+	const ldm =  createLineMaterial({
+	    color: color,
+	    linewidth: style.linewidth,
+	    opacity: style.opacity,
+	    transparent: true
+	});
+
+	//ldm.defines.USE_DASH = "";
+	ldm.needsUpdate = true;
+
+	photon = new Line2(
+	    new LineGeometry().setPositions(
+		[...pt1.toArray(), ...pt2.toArray()]
+	    ),
+	    ldm
+	);
+
+    } else {
+
+	photon = new LineSegments(
+	    new BufferGeometry().setFromPoints(
+		[pt1, pt2]
+	    ),
+	    new LineBasicMaterial({
+		color: color,
+		opacity: style.opacity,
+		transparent: true
 	    })
 	);
 	

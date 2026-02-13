@@ -194,8 +194,8 @@ ispy.onMouseMove = function(e) {
 
 	const res = intersects.filter(function(res) {
 
-	    return res && res.object;
-	    
+	    return res && res.object && ! res.object.name.includes('Candidates');
+
 	})[0];
 	
 	if ( res && res.object ) {
@@ -634,6 +634,9 @@ ispy.highlightTableRow = function(key, objectUserData, doEffect) {
 ispy.highlightObject = function(objectId) {
 
     var selected = ispy.scene.getObjectById(Number(objectId), true);
+
+    if ( selected && selected.name.includes('Candidates') )
+	return;
 
     document.body.style.cursor = "pointer";
     

@@ -815,7 +815,6 @@ ispy.loadLocalGLTF = function(file) {
 		if (c.material) {
 		    c.material.clippingPlanes = ispy.local_planes;
 		    c.material.transparent = true;
-		    c.material.opacity = ispy.importTransparency;
 		    c.renderOrder = -1;
 		}
 
