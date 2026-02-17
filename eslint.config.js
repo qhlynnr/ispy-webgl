@@ -1,0 +1,50 @@
+import js from "@eslint/js";
+
+export default [
+  js.configs.recommended,
+  {
+    ignores: ["js/lib/**"],
+  },
+  {
+    files: ["js/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        window: "readonly",
+        document: "readonly",
+        console: "readonly",
+        requestAnimationFrame: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        alert: "readonly",
+        confirm: "readonly",
+        performance: "readonly",
+        navigator: "readonly",
+        location: "readonly",
+        FileReader: "readonly",
+        File: "readonly",
+        FileList: "readonly",
+        Blob: "readonly",
+        URL: "readonly",
+        XMLHttpRequest: "readonly",
+        fetch: "readonly",
+        HTMLElement: "readonly",
+        Event: "readonly",
+        KeyboardEvent: "readonly",
+        MouseEvent: "readonly",
+        DragEvent: "readonly",
+        Image: "readonly",
+      },
+    },
+    rules: {
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "no-case-declarations": "off",
+      "no-prototype-builtins": "off",
+      "no-useless-assignment": "warn",
+      "no-useless-escape": "warn",
+    },
+  },
+];
