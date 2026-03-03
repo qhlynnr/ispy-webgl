@@ -207,9 +207,9 @@ ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 	return;
 
     sf.add(row_obj, 'opacity', 0, 1).onChange(function() {
-	
+
 	ispy.views.forEach(v => {
-	    
+
 	    let obj = ispy.scenes[v].getObjectByName(key);
 
 	    if ( ! obj )
@@ -217,7 +217,15 @@ ispy.addSelectionRow = function(group, key, name, objectIds, visible) {
 
 	    obj.children.forEach(function(o) {
 
-		o.material.opacity = row_obj.opacity;
+		o.traverse(function(oc) {
+
+		    if ( oc.material ) {
+			oc.material.transparent = true;
+			oc.material.opacity = row_obj.opacity;
+			oc.material.needsUpdate = true;
+		    }
+
+		});
 
 	    });
 
