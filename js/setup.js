@@ -469,8 +469,8 @@ ispy.init = function() {
     ispy.p_camera = new PerspectiveCamera(
 	75,
 	width/height,
-	0.1,
-	100
+	0.01,
+	10000
     );
 
     ispy.p_camera.name = 'PerspectiveCamera';
@@ -480,8 +480,8 @@ ispy.init = function() {
 	width / 2,
 	height / 2,
 	height / -2,
-	0.1,
-	100
+	0.01,
+	10000
     );
  
     ispy.o_camera.name = 'OrthographicCamera';

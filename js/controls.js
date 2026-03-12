@@ -83,10 +83,10 @@ ispy.setOrthographic = function() {
     const aspect = ispy.p_camera.aspect;
     const near = ispy.p_camera.near;
     const far = ispy.p_camera.far;
-    
-    const focus = (near+far)/2;
 
-    let half_height = Math.tan(fov*Math.PI/180/2)*focus;
+    const distance = ispy.p_camera.position.distanceTo(ispy.controls.target);
+
+    let half_height = Math.tan(fov*Math.PI/180/2)*distance;
     let half_width = half_height*aspect;
 
     half_height /= ispy.p_camera.zoom;
@@ -96,7 +96,9 @@ ispy.setOrthographic = function() {
     ispy.camera.right = half_width;
     ispy.camera.top = half_height;
     ispy.camera.bottom = -half_height;
-    
+    ispy.camera.near = -far;
+    ispy.camera.far = far;
+
     ispy.camera.updateProjectionMatrix();
 
     ispy.controls.object = ispy.camera;
