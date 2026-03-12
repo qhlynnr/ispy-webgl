@@ -482,6 +482,11 @@ ispy.event_description = {
             fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 2.0},
 	    selection: {"min_et": 10.0}
         },
+	"PATTaus_V1": {
+	    type: ispy.SHAPE, on: true, group: "Physics", name: "Taus (PAT)",
+	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 0%, 50%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
+	},
 	"Photons_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Photons (Reco)",
 	    fn: ispy.makePhoton, style: {color: "rgb(100%, 80%, 0%)", opacity: 1.0, linewidth: 2}, selection: {"min_energy": 10.0}
@@ -592,7 +597,7 @@ ispy.event_description = {
             fn:ispy.makeVertex, style: {radius: 0.001, color: "rgb(100%, 40%, 0%)", opacity: 0.9}
 	},
 	"VertexCompositeCandidates_V1": {
-	    type:ispy.SHAPE, on:false, group:"Physics", name: "V0Vertices (Reco)",
+	    type:ispy.SHAPE, on:false, group:"Physics", name: "Vertex Composite Cands. (Reco)",
 	    fn:ispy.makeVertexCompositeCandidate, style: {radius: 0.002, color: "rgb(100%, 0%, 0%)", opacity: 0.9}
 	},
 	"SimVertices_V1": {
@@ -863,6 +868,11 @@ ispy.event_description = {
             fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 2.0},
 	    selection: {"min_et": 10.0}
         },
+	"PATTaus_V1": {
+	    type: ispy.SHAPE, on: true, group: "Physics", name: "Taus (PAT)",
+	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 0%, 50%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
+	},
 	"Photons_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Photons (Reco)",
 	    fn: ispy.makePhoton, style: {color: "rgb(100%, 80%, 0%)", opacity: 1.0, linewidth: 2}, selection: {"min_energy": 10.0}
@@ -1246,6 +1256,11 @@ ispy.event_description = {
             fn: ispy.makeJetWithVertexRZ, style: {color: "rgb(100%, 50%, 0%)", opacity: 0.3, width: 2.0},
 	    selection: {"min_et": 10.0}
         },
+	"PATTaus_V1": {
+	    type: ispy.SHAPE, on: true, group: "Physics", name: "Taus (PAT)",
+	    fn: ispy.makeJetWithVertex, style: {color: "rgb(100%, 0%, 50%)", opacity: 0.3, width: 1.0},
+	    selection: {"min_et": 10.0}
+	},
 	"Photons_V1": {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Photons (Reco)",
 	    fn: ispy.makePhotonRZ, style: {color: "rgb(100%, 80%, 0%)", opacity: 1.0, linewidth: 2}, selection: {"min_energy": 10.0}
