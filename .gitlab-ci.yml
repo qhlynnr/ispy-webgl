@@ -1,0 +1,46 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: node:lts
+  script:
+    - npm ci
+    - npm run build
+    - mkdir -p public && cp -r dist/* public/
+  artifacts:
+    paths:
+      - public/
+    expire_in: 1 hour
+  only:
+    - dev
+    - prod
+
+deploy-dev:
+  stage: deploy
+  image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+  variables:
+    EOS_PATH: "/eos/project-i/ispy/www/ispy-webgl-dev"
+    EOS_MGM_URL: "root://eosproject.cern.ch"
+    METHOD: "rsync"
+  script:
+    - deploy-eos
+  before_script: []
+  after_script: []
+  only:
+    - dev
+
+deploy-prod:
+  stage: deploy
+  image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+  variables:
+    EOS_PATH: "/eos/project-i/ispy/www/ispy-webgl"
+    EOS_MGM_URL: "root://eosproject.cern.ch"
+    METHOD: "rsync"
+  script:
+    - deploy-eos
+  before_script: []
+  after_script: []
+  only:
+    - prod
