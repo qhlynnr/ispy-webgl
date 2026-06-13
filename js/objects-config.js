@@ -443,6 +443,12 @@ ispy.event_description = {
 	    type: ispy.SHAPE, on: false, group: "Physics", name: "Jets (Reco)",
 	    fn: ispy.makeJet, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.75}, selection: {"min_et": 10.0}
 	},
+
+	"Jets_V2": {
+	    type: ispy.SHAPE, on: false, group: "Physics", name: "Jets (Reco)",
+	    fn: ispy.makeJet, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.75}, selection: {"min_et": 10.0}
+	},
+
 	"PFJets_V1": {
 	    type: ispy.SHAPE, on: true, group: "Physics", name: "Jets (PF)",
 	    fn: ispy.makeJet, style: {color: "rgb(100%, 100%, 0%)", opacity: 0.6},
